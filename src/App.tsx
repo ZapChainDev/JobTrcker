@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import { Login } from './pages/Login';
+import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import Layout from './components/Layout';
 import { ProfileSetup } from './components/ProfileSetup';
@@ -11,34 +11,33 @@ import { ProfileSetup } from './components/ProfileSetup';
 console.log("Test Message from .env:", import.meta.env.VITE_TEST_MESSAGE);
 
 function App() {
+  const { user, isProfileComplete } = useAuth();
+
   return (
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
+          <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
           <Route
-            path="/profile-setup"
+            path="/dashboard"
             element={
-              <PrivateRoute>
-                <ProfileSetup onProfileComplete={() => {}} />
-              </PrivateRoute>
+              user ? (
+                isProfileComplete ? (
+                  <Dashboard />
+                ) : (
+                  <ProfileSetup />
+                )
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
-          <Route element={<Layout />}>
-            <Route
-              path="/"
-              element={
-                <PrivateRoute>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
         </Routes>
       </AuthProvider>
     </Router>
   );
 }
+
 export default App;

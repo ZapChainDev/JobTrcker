@@ -16,6 +16,23 @@ import { CalendarView } from '../components/CalendarView';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { ApplicationCard } from '@/components/ApplicationCard';
 
+interface ApplicationCardProps {
+  application: JobApplication;
+}
+
+function ApplicationCard({ application }: ApplicationCardProps) {
+  return (
+    <div className="p-4 border rounded-lg shadow-sm">
+      <h3 className="text-lg font-semibold">{application.jobTitle}</h3>
+      <p className="text-gray-600">{application.companyName}</p>
+      <p className="text-sm text-gray-500">Status: {application.status}</p>
+      {application.notes && (
+        <p className="mt-2 text-sm text-gray-600">{application.notes}</p>
+      )}
+    </div>
+  );
+}
+
 export function Dashboard() {
   const { user } = useAuth();
   const [applications, setApplications] = useState<JobApplication[]>([]);
