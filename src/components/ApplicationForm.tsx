@@ -10,8 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { JobApplication } from '@/lib/types';
 
 interface ApplicationFormProps {
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   application?: JobApplication;
   onSuccess?: () => void;
 }
@@ -25,7 +25,7 @@ interface ApplicationFormData {
   resumeLink: string;
 }
 
-export default function ApplicationForm({ isOpen, onClose, application, onSuccess }: ApplicationFormProps) {
+export default function ApplicationForm({ open, onOpenChange, application, onSuccess }: ApplicationFormProps) {
   const [formData, setFormData] = useState<ApplicationFormData>({
     jobTitle: '',
     companyName: '',
@@ -92,7 +92,7 @@ export default function ApplicationForm({ isOpen, onClose, application, onSucces
         });
       }
 
-      onClose();
+      onOpenChange(false);
       if (onSuccess) {
         onSuccess();
       }
@@ -104,7 +104,7 @@ export default function ApplicationForm({ isOpen, onClose, application, onSucces
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -195,7 +195,7 @@ export default function ApplicationForm({ isOpen, onClose, application, onSucces
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>

@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import ApplicationForm from '../components/ApplicationForm';
+import { ApplicationForm } from '@/components/ApplicationForm';
 import { JobApplication, StatusChange } from '../lib/types';
 import { useNavigate } from 'react-router-dom';
 import { CalendarView } from '../components/CalendarView';
