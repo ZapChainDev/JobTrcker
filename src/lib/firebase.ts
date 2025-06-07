@@ -12,13 +12,6 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-console.log('Firebase Config - API Key:', firebaseConfig.apiKey);
-console.log('Firebase Config - Auth Domain:', firebaseConfig.authDomain);
-console.log('Firebase Config - Project ID:', firebaseConfig.projectId);
-console.log('Firebase Config - Storage Bucket:', firebaseConfig.storageBucket);
-console.log('Firebase Config - Messaging Sender ID:', firebaseConfig.messagingSenderId);
-console.log('Firebase Config - App ID:', firebaseConfig.appId);
-console.log('Firebase Config - Measurement ID:', firebaseConfig.measurementId);
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
