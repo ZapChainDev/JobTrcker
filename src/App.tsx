@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
-import Layout from './components/Layout';
 import { ProfileSetup } from './components/ProfileSetup';
 
 console.log("Test Message from .env:", import.meta.env.VITE_TEST_MESSAGE);

@@ -1,37 +1,19 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, deleteDoc, doc, Timestamp, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, deleteDoc, doc, orderBy } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '../components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent, CardTitle } from '../components/ui/card';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ApplicationForm } from '@/components/ApplicationForm';
-import { JobApplication, StatusChange } from '../lib/types';
+import ApplicationForm from '@/components/ApplicationForm';
+import { JobApplication } from '../lib/types';
 import { useNavigate } from 'react-router-dom';
 import { CalendarView } from '../components/CalendarView';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { ApplicationCard } from '@/components/ApplicationCard';
-
-interface ApplicationCardProps {
-  application: JobApplication;
-}
-
-function ApplicationCard({ application }: ApplicationCardProps) {
-  return (
-    <div className="p-4 border rounded-lg shadow-sm">
-      <h3 className="text-lg font-semibold">{application.jobTitle}</h3>
-      <p className="text-gray-600">{application.companyName}</p>
-      <p className="text-sm text-gray-500">Status: {application.status}</p>
-      {application.notes && (
-        <p className="mt-2 text-sm text-gray-600">{application.notes}</p>
-      )}
-    </div>
-  );
-}
+import { ApplicationCard } from '../components/ApplicationCard';
 
 export function Dashboard() {
   const { currentUser } = useAuth();
@@ -66,6 +48,7 @@ export function Dashboard() {
       
       setApplications(apps);
       setFilteredApplications(apps);
+      setIsLoading(false);
     };
 
     fetchApplications();
@@ -108,24 +91,9 @@ export function Dashboard() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'applied':
-        return 'bg-blue-100 text-blue-800';
-      case 'interviewing':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'rejected':
-        return 'bg-red-100 text-red-800';
-      case 'offer':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   const handleCloseForm = () => {
     setIsFormOpen(false);
-    setSelectedApplication(undefined); // Clear selected application when form closes
+    setSelectedApplication(undefined);
   };
 
   const handleSignOut = async () => {
@@ -245,26 +213,16 @@ export function Dashboard() {
             }}>Add Application</Button>
           </div>
 
-          {filteredApplications.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <p className="text-muted-foreground">
-                  No applications yet. Add your first job application!
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredApplications.map((app) => (
-                <ApplicationCard 
-                  key={app.id} 
-                  application={app}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
-          )}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredApplications.map(app => (
+              <ApplicationCard 
+                key={app.id} 
+                application={app}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
         </TabsContent>
 
         <TabsContent value="calendar">
@@ -272,17 +230,12 @@ export function Dashboard() {
         </TabsContent>
       </Tabs>
 
-      {isFormOpen && selectedApplication === undefined && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-background rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <ApplicationForm
-              isOpen={isFormOpen && selectedApplication === undefined}
-              onClose={handleCloseForm}
-              onSuccess={handleFormSuccess}
-            />
-          </div>
-        </div>
-      )}
+      <ApplicationForm 
+        open={isFormOpen} 
+        onOpenChange={setIsFormOpen}
+        application={selectedApplication}
+        onSuccess={handleFormSuccess}
+      />
     </div>
   );
 } 
