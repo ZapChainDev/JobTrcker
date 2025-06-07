@@ -14,15 +14,16 @@ import { JobApplication, StatusChange } from '../lib/types';
 import { useNavigate } from 'react-router-dom';
 import { CalendarView } from '../components/CalendarView';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { ApplicationCard } from '@/components/ApplicationCard';
 
 export function Dashboard() {
+  const { user } = useAuth();
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [filteredApplications, setFilteredApplications] = useState<JobApplication[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<JobApplication | undefined>(undefined);
-  const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -34,37 +35,24 @@ export function Dashboard() {
   }, { applied: 0, interviewing: 0, rejected: 0, offer: 0 });
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const user = auth.currentUser;
-      if (!user) {
-        navigate('/login');
-        return;
-      }
-
-      try {
-        const applicationsRef = collection(db, 'applications');
-        const q = query(
-          applicationsRef,
-          where('userId', '==', user.uid),
-          orderBy('applicationDate', 'desc')
-        );
-
-        const querySnapshot = await getDocs(q);
-        const apps: JobApplication[] = [];
-        querySnapshot.forEach((doc) => {
-          apps.push({ id: doc.id, ...doc.data() } as JobApplication);
-        });
-        setApplications(apps);
-        setFilteredApplications(apps);
-      } catch (error) {
-        console.error('Error fetching applications:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    const fetchApplications = async () => {
+      if (!user) return;
+      
+      const applicationsRef = collection(db, 'applications');
+      const q = query(applicationsRef, where('userId', '==', user.uid));
+      const querySnapshot = await getDocs(q);
+      
+      const apps = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as JobApplication[];
+      
+      setApplications(apps);
+      setFilteredApplications(apps);
     };
 
-    checkAuth();
-  }, [navigate]);
+    fetchApplications();
+  }, [user]);
 
   useEffect(() => {
     let filtered = applications;
@@ -246,89 +234,7 @@ export function Dashboard() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredApplications.map((app) => (
-                <Card key={app.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out rounded-lg overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-4 flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-xl font-bold mb-1">{app.jobTitle}</CardTitle>
-                      <p className="text-sm opacity-90">{app.companyName}</p>
-                    </div>
-                    <Badge className={getStatusColor(app.status)}>
-                      {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                    </Badge>
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3">
-                    <div className="flex justify-between items-center text-sm text-gray-700">
-                      <span className="font-medium">Applied:</span>
-                      <span>{new Date(app.applicationDate).toLocaleDateString()}</span>
-                    </div>
-                    {app.notes && (
-                      <div className="text-sm text-gray-700">
-                        <span className="font-medium">Notes:</span>
-                        <p className="mt-1 text-gray-600 leading-relaxed">{app.notes}</p>
-                      </div>
-                    )}
-                    {app.resumeLink && (
-                      <div className="text-sm">
-                        <a
-                          href={app.resumeLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-500 font-medium flex items-center"
-                        >
-                          View Resume <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 ml-1"> <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/> </svg>
-                        </a>
-                      </div>
-                    )}
-                    <div className="flex justify-end gap-2 pt-4">
-                      <Dialog open={isFormOpen && selectedApplication?.id === app.id} onOpenChange={setIsFormOpen}>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="text-gray-600 hover:bg-gray-100 flex items-center" onClick={() => setSelectedApplication(app)}>
-                            <Pencil className="w-4 h-4 mr-1" /> Edit
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                            <DialogTitle>Edit Application</DialogTitle>
-                          </DialogHeader>
-                          <ApplicationForm
-                            isOpen={isFormOpen && selectedApplication?.id === app.id}
-                            onClose={handleCloseForm}
-                            application={selectedApplication}
-                            onSuccess={handleFormSuccess}
-                          />
-                        </DialogContent>
-                      </Dialog>
-                      <Button
-                        variant="destructive" size="sm" className="bg-red-500 hover:bg-red-600 text-white flex items-center"
-                        onClick={() => handleDelete(app.id)}
-                      >
-                        <Trash2 className="w-4 h-4 mr-1" /> Delete
-                      </Button>
-                    </div>
-                    <p className="text-sm">Status: {app.status}</p>
-                    {/* Status History */}
-                    {app.statusHistory && app.statusHistory.length > 0 && (
-                      <div className="text-sm text-gray-700">
-                        <span className="font-medium">Status History:</span>
-                        <p className="mt-1 text-gray-600 leading-relaxed">
-                          {app.statusHistory
-                            .sort((a, b) => a.timestamp.toDate().getTime() - b.timestamp.toDate().getTime())
-                            .map((entry, index) => (
-                              <span key={index}>
-                                {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
-                                {index < app.statusHistory.length - 1 && ' → '}
-                              </span>
-                            ))}
-                        </p>
-                      </div>
-                    )}
-                    {app.notes && (
-                      <p className="text-sm text-muted-foreground">
-                        {app.notes}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
+                <ApplicationCard key={app.id} application={app} />
               ))}
             </div>
           )}

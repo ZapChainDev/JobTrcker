@@ -9,11 +9,7 @@ import { Textarea } from './ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { useAuth } from '../contexts/AuthContext';
 
-interface ProfileSetupProps {
-  onProfileComplete: () => void;
-}
-
-export function ProfileSetup({ onProfileComplete }: ProfileSetupProps) {
+export function ProfileSetup() {
   const navigate = useNavigate();
   const { refreshUserProfile } = useAuth();
   const [name, setName] = useState('');
