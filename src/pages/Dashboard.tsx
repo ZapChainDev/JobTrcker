@@ -34,7 +34,7 @@ function ApplicationCard({ application }: ApplicationCardProps) {
 }
 
 export function Dashboard() {
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [filteredApplications, setFilteredApplications] = useState<JobApplication[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -53,10 +53,10 @@ export function Dashboard() {
 
   useEffect(() => {
     const fetchApplications = async () => {
-      if (!user) return;
+      if (!currentUser) return;
       
       const applicationsRef = collection(db, 'applications');
-      const q = query(applicationsRef, where('userId', '==', user.uid));
+      const q = query(applicationsRef, where('userId', '==', currentUser.uid));
       const querySnapshot = await getDocs(q);
       
       const apps = querySnapshot.docs.map(doc => ({
@@ -69,7 +69,7 @@ export function Dashboard() {
     };
 
     fetchApplications();
-  }, [user]);
+  }, [currentUser]);
 
   useEffect(() => {
     let filtered = applications;
@@ -89,6 +89,11 @@ export function Dashboard() {
 
     setFilteredApplications(filtered);
   }, [applications, statusFilter, searchQuery]);
+
+  const handleEdit = (application: JobApplication) => {
+    setSelectedApplication(application);
+    setIsFormOpen(true);
+  };
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this application?')) {
@@ -251,7 +256,12 @@ export function Dashboard() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredApplications.map((app) => (
-                <ApplicationCard key={app.id} application={app} />
+                <ApplicationCard 
+                  key={app.id} 
+                  application={app}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
               ))}
             </div>
           )}
