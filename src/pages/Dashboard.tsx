@@ -6,8 +6,6 @@ import { Button } from '../components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardTitle } from '../components/ui/card';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import ApplicationForm from '@/components/ApplicationForm';
 import { JobApplication } from '../lib/types';
 import { useNavigate } from 'react-router-dom';
@@ -89,11 +87,6 @@ export function Dashboard() {
         console.error('Error deleting application:', error);
       }
     }
-  };
-
-  const handleCloseForm = () => {
-    setIsFormOpen(false);
-    setSelectedApplication(undefined);
   };
 
   const handleSignOut = async () => {
