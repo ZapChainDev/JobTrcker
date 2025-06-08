@@ -15,31 +15,29 @@ function App() {
   return (
     <Router>
       {currentUser && <Navbar />}
-      <div className="pt-16">
-        <Routes>
-          <Route path="/login" element={!currentUser ? <Login /> : <Navigate to="/dashboard" />} />
-          <Route path="/register" element={!currentUser ? <Register /> : <Navigate to="/dashboard" />} />
-          <Route
-            path="/dashboard"
-            element={
-              currentUser ? (
-                userProfile ? (
-                  <Dashboard />
-                ) : (
-                  <ProfileSetup />
-                )
+      <Routes>
+        <Route path="/login" element={!currentUser ? <Login /> : <Navigate to="/dashboard" />} />
+        <Route path="/register" element={!currentUser ? <Register /> : <Navigate to="/dashboard" />} />
+        <Route
+          path="/dashboard"
+          element={
+            currentUser ? (
+              userProfile ? (
+                <Dashboard />
               ) : (
-                <Navigate to="/login" />
+                <ProfileSetup />
               )
-            }
-          />
-          <Route
-            path="/profile"
-            element={currentUser ? <Profile /> : <Navigate to="/login" />}
-          />
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </div>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/profile"
+          element={currentUser ? <Profile /> : <Navigate to="/login" />}
+        />
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+      </Routes>
     </Router>
   );
 }

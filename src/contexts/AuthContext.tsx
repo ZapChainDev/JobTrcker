@@ -1,87 +1,189 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { 
-  getAuth, 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut,
-  GoogleAuthProvider,
-  signInWithPopup,
+  getAuth,
   User as FirebaseUser,
-  UserCredential as FirebaseUserCredential
+  UserCredential as FirebaseUserCredential,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  signInWithPopup,
+  updateProfile,
+  updateEmail,
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  linkWithCredential,
+  GoogleAuthProvider,
+  fetchSignInMethodsForEmail
 } from 'firebase/auth';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { app } from '../lib/firebase';
-
-interface User {
-  uid: string;
-  email: string | null;
-  displayName: string | null;
-  photoURL: string | null;
-}
+import { UserProfile } from '../lib/types';
 
 interface AuthContextType {
-  user: User | null;
+  currentUser: FirebaseUser | null;
+  userProfile: UserProfile | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<FirebaseUserCredential>;
-  signup: (email: string, password: string) => Promise<FirebaseUserCredential>;
+  error: string | null;
+  signIn: (email: string, password: string) => Promise<FirebaseUserCredential>;
+  signUp: (email: string, password: string, displayName: string) => Promise<FirebaseUserCredential>;
   logout: () => Promise<void>;
-  loginWithGoogle: () => Promise<FirebaseUserCredential>;
+  updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
+  linkEmailPassword: (email: string, password: string) => Promise<void>;
+  refreshUserProfile: () => Promise<void>;
+  googleSignIn: () => Promise<FirebaseUserCredential>;
+  isGoogleUser: boolean;
+  checkEmailProvider: (email: string) => Promise<string[]>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const [isGoogleUser, setIsGoogleUser] = useState(false);
+
+  const fetchAndSetUserProfile = async (user: FirebaseUser) => {
+    try {
+      const docRef = doc(db, 'userProfiles', user.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setUserProfile(docSnap.data() as UserProfile);
+      } else {
+        setUserProfile(null);
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      setUserProfile(null);
+    }
+  };
+
+  const refreshUserProfile = async () => {
+    if (auth.currentUser) {
+      await fetchAndSetUserProfile(auth.currentUser);
+    }
+  };
+
+  async function checkEmailProvider(email: string) {
+    return await fetchSignInMethodsForEmail(auth, email);
+  }
+
+  function signIn(email: string, password: string) {
+    return signInWithEmailAndPassword(auth, email, password);
+  }
+
+  function signUp(email: string, password: string, displayName: string) {
+    return createUserWithEmailAndPassword(auth, email, password);
+  }
+
+  async function logout() {
+    await signOut(auth);
+  }
+
+  async function updateUserProfile(data: Partial<UserProfile>) {
+    if (!currentUser) {
+      throw new Error('No user is currently signed in');
+    }
+
+    try {
+      await updateProfile(currentUser, data);
+      if (userProfile) {
+        await setDoc(doc(db, 'userProfiles', currentUser.uid), {
+          ...userProfile,
+          ...data
+        }, { merge: true });
+      }
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+    }
+  }
+
+  async function linkEmailPassword(email: string, password: string) {
+    if (!currentUser) {
+      throw new Error('No user is currently signed in');
+    }
+
+    // Check if the email matches the current user's email
+    if (email !== currentUser.email) {
+      throw new Error('Email must match your Google account email');
+    }
+
+    try {
+      // Create email/password credential
+      const credential = EmailAuthProvider.credential(email, password);
+      
+      // Link the credential to the current user
+      const result = await linkWithCredential(currentUser, credential);
+      
+      // Update user profile to indicate email/password is now available
+      const userRef = doc(db, 'userProfiles', currentUser.uid);
+      await setDoc(userRef, {
+        hasEmailPassword: true,
+        email: email
+      }, { merge: true });
+
+      return result;
+    } catch (error: any) {
+      if (error.code === 'auth/credential-already-in-use') {
+        throw new Error('This email/password combination is already in use with another account.');
+      }
+      throw error;
+    }
+  }
+
+  async function googleSignIn() {
+    const result = await signInWithPopup(auth, googleProvider);
+    setIsGoogleUser(true);
+    return result;
+  }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-        const userData = userDoc.data();
-        
-        setUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName || userData?.displayName || null,
-          photoURL: firebaseUser.photoURL || userData?.photoURL || null,
-        });
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+      if (user) {
+        await fetchAndSetUserProfile(user);
+        // Check if the user signed in with Google
+        const isGoogle = user.providerData.some(
+          provider => provider.providerId === GoogleAuthProvider.PROVIDER_ID
+        );
+        setIsGoogleUser(isGoogle);
       } else {
-        setUser(null);
+        setUserProfile(undefined);
+        setIsGoogleUser(false);
       }
       setLoading(false);
     });
 
-    return () => unsubscribe();
-  }, [auth, db]);
-
-  const login = (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
-  };
-
-  const signup = (email: string, password: string) => {
-    return createUserWithEmailAndPassword(auth, email, password);
-  };
-
-  const logout = () => {
-    return signOut(auth);
-  };
-
-  const loginWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
-  };
+    return unsubscribe;
+  }, []);
 
   const value = {
-    user,
+    currentUser,
+    userProfile,
     loading,
-    login,
-    signup,
+    error,
+    signIn,
+    signUp,
     logout,
-    loginWithGoogle,
+    updateUserProfile,
+    linkEmailPassword,
+    refreshUserProfile,
+    googleSignIn,
+    isGoogleUser,
+    checkEmailProvider,
   };
 
   return (
@@ -89,12 +191,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {!loading && children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 } 

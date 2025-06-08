@@ -3,46 +3,58 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
-import { GoogleAuthProvider, EmailAuthProvider, updateProfile, UserInfo } from 'firebase/auth';
+import { GoogleAuthProvider, EmailAuthProvider, updateProfile } from 'firebase/auth';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Pencil, Save, X } from 'lucide-react';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { UserProfile } from '../lib/types';
 
 export default function Profile() {
   const { currentUser, userProfile, linkEmailPassword, refreshUserProfile } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [displayName, setDisplayName] = useState(currentUser?.displayName || '');
-  const [photoURL, setPhotoURL] = useState(currentUser?.photoURL || '');
-  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [formData, setFormData] = useState<Partial<UserProfile>>({
+    displayName: '',
+    email: '',
+    photoURL: ''
+  });
   const [isEditing, setIsEditing] = useState(false);
-  
-  // Temporary states for editable profile fields
-  const [tempDisplayName, setTempDisplayName] = useState(displayName);
-  const [tempPhotoURL, setTempPhotoURL] = useState(photoURL);
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [tempDisplayName, setTempDisplayName] = useState(formData.displayName || '');
+  const [tempPhotoURL, setTempPhotoURL] = useState(formData.photoURL || '');
   const [tempAge, setTempAge] = useState(userProfile?.age || '');
   const [tempCourse, setTempCourse] = useState(userProfile?.course || '');
   const [tempMotivation, setTempMotivation] = useState(userProfile?.motivation || '');
   const [tempName, setTempName] = useState(userProfile?.name || '');
 
   const hasEmailPasswordProvider = currentUser?.providerData.some(
-    (provider: UserInfo) => provider.providerId === EmailAuthProvider.PROVIDER_ID
+    (provider) => provider.providerId === EmailAuthProvider.PROVIDER_ID
   );
   const isGoogleLinked = currentUser?.providerData.some(
-    (provider: UserInfo) => provider.providerId === GoogleAuthProvider.PROVIDER_ID
+    (provider) => provider.providerId === GoogleAuthProvider.PROVIDER_ID
   );
+
+  useEffect(() => {
+    if (userProfile) {
+      setFormData({
+        displayName: userProfile.displayName,
+        email: userProfile.email,
+        photoURL: userProfile.photoURL
+      });
+    }
+  }, [userProfile]);
 
   // Effect to update profile picture from Google when user signs in
   useEffect(() => {
     const updateProfileFromGoogle = async () => {
       if (currentUser && isGoogleLinked) {
         const googleProvider = currentUser.providerData.find(
-          (provider: UserInfo) => provider.providerId === GoogleAuthProvider.PROVIDER_ID
+          (provider) => provider.providerId === GoogleAuthProvider.PROVIDER_ID
         );
         
         if (googleProvider?.photoURL && googleProvider.photoURL !== currentUser.photoURL) {
@@ -50,7 +62,6 @@ export default function Profile() {
             await updateProfile(currentUser, {
               photoURL: googleProvider.photoURL
             });
-            setPhotoURL(googleProvider.photoURL);
             setTempPhotoURL(googleProvider.photoURL);
             await refreshUserProfile();
           } catch (err) {
@@ -65,18 +76,18 @@ export default function Profile() {
 
   // Update temp values when displayName, photoURL, or userProfile changes
   useEffect(() => {
-    setTempDisplayName(displayName);
-    setTempPhotoURL(photoURL);
+    setTempDisplayName(formData.displayName || '');
+    setTempPhotoURL(formData.photoURL || '');
     setTempAge(userProfile?.age || '');
     setTempCourse(userProfile?.course || '');
     setTempMotivation(userProfile?.motivation || '');
     setTempName(userProfile?.name || '');
-  }, [displayName, photoURL, userProfile]);
+  }, [formData, userProfile]);
 
   const handleLinkEmailPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setMessage('');
+    setSuccess('');
     setLoading(true);
 
     if (password !== confirmPassword) {
@@ -87,7 +98,7 @@ export default function Profile() {
 
     try {
       await linkEmailPassword(email, password);
-      setMessage('Email and password successfully linked!');
+      setSuccess('Email and password successfully linked!');
       await refreshUserProfile();
       setEmail('');
       setPassword('');
@@ -103,7 +114,7 @@ export default function Profile() {
     e.preventDefault();
     setIsUpdatingProfile(true);
     setError('');
-    setMessage('');
+    setSuccess('');
 
     try {
       if (currentUser) {
@@ -112,8 +123,10 @@ export default function Profile() {
           displayName: tempDisplayName,
           photoURL: tempPhotoURL || null
         });
-        setDisplayName(tempDisplayName);
-        setPhotoURL(tempPhotoURL);
+        setFormData({
+          displayName: tempDisplayName,
+          photoURL: tempPhotoURL
+        });
 
         // Update Firestore user profile (age, course, motivation, name)
         const userRef = doc(db, 'userProfiles', currentUser.uid);
@@ -124,7 +137,7 @@ export default function Profile() {
           name: tempName,
         }, { merge: true });
 
-        setMessage('Profile updated successfully!');
+        setSuccess('Profile updated successfully!');
         await refreshUserProfile(); // Refresh user profile to reflect Firestore changes
         setIsEditing(false);
       }
@@ -136,15 +149,15 @@ export default function Profile() {
   };
 
   const handleCancelEdit = () => {
-    setTempDisplayName(displayName);
-    setTempPhotoURL(photoURL);
+    setTempDisplayName(formData.displayName || '');
+    setTempPhotoURL(formData.photoURL || '');
     setTempAge(userProfile?.age || '');
     setTempCourse(userProfile?.course || '');
     setTempMotivation(userProfile?.motivation || '');
     setTempName(userProfile?.name || '');
     setIsEditing(false);
     setError('');
-    setMessage('');
+    setSuccess('');
   };
 
   if (!currentUser) {
@@ -196,7 +209,7 @@ export default function Profile() {
                 <Input
                   id="display-name"
                   type="text"
-                  value={isEditing ? tempDisplayName : displayName}
+                  value={isEditing ? tempDisplayName : formData.displayName}
                   onChange={(e) => setTempDisplayName(e.target.value)}
                   className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm"
                   placeholder="Enter your display name"
@@ -211,7 +224,7 @@ export default function Profile() {
                   <Input
                     id="photo-url"
                     type="url"
-                    value={isEditing ? tempPhotoURL : photoURL}
+                    value={isEditing ? tempPhotoURL : formData.photoURL}
                     onChange={(e) => setTempPhotoURL(e.target.value)}
                     className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm"
                     placeholder="Enter profile picture URL"
@@ -240,7 +253,7 @@ export default function Profile() {
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Account Information</h3>
             <p className="text-gray-700 dark:text-gray-300"><strong>Email:</strong> {currentUser.email}</p>
             <p className="text-gray-700 dark:text-gray-300"><strong>User ID:</strong> {currentUser.uid}</p>
-            <p className="text-gray-700 dark:text-gray-300"><strong>Providers:</strong> {currentUser.providerData.map((p: UserInfo) => p.providerId).join(', ') || 'None'}</p>
+            <p className="text-gray-700 dark:text-gray-300"><strong>Providers:</strong> {currentUser.providerData.map(p => p.providerId).join(', ') || 'None'}</p>
           </div>
 
           {/* New Section for Editable User Profile Details */}
@@ -306,7 +319,7 @@ export default function Profile() {
               {!isEditing && userProfile?.id && (
                 <div>
                   <label htmlFor="user-id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    ID
+                    User ID
                   </label>
                   <Input
                     id="user-id"
@@ -338,7 +351,7 @@ export default function Profile() {
             <form onSubmit={handleLinkEmailPassword} className="space-y-6">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-2">Link Email and Password</h3>
               {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">{error}</div>}
-              {message && <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md">{message}</div>}
+              {success && <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md">{success}</div>}
               <div>
                 <label htmlFor="link-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Email

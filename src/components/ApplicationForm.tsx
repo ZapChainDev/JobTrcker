@@ -23,7 +23,7 @@ interface ApplicationFormData {
   status: 'applied' | 'interviewing' | 'rejected' | 'offer';
   notes: string;
   resumeLink: string;
-  websiteLink?: string;
+  websiteLink: string;
 }
 
 export default function ApplicationForm({ open, onOpenChange, application, onSuccess }: ApplicationFormProps) {
@@ -200,18 +200,18 @@ export default function ApplicationForm({ open, onOpenChange, application, onSuc
 
           <div>
             <label htmlFor="websiteLink" className="block text-sm font-medium text-gray-700">
-              Website Link
+              Job Posting Link
             </label>
             <Input
               id="websiteLink"
               type="url"
               value={formData.websiteLink}
               onChange={(e) => setFormData({ ...formData, websiteLink: e.target.value })}
-              placeholder="https://www.example.com"
+              placeholder="https://..."
             />
           </div>
 
-          <div className="flex justify-end space-x-2">
+          <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>

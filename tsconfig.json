@@ -5,7 +5,6 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "esModuleInterop": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -24,10 +23,7 @@
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "firebase/app": ["./node_modules/firebase/app/dist/app/index.d.ts"],
-      "firebase/auth": ["./node_modules/firebase/auth/dist/auth/index.d.ts"],
-      "firebase/firestore": ["./node_modules/firebase/firestore/dist/app/index.cdn.d.ts"]
+      "@/*": ["src/*"]
     }
   },
   "include": ["src"],

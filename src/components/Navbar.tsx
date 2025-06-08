@@ -1,14 +1,14 @@
-import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+} from '@/components/ui/dropdown-menu';
 
 export function Navbar() {
   const { currentUser, signOut } = useAuth();
@@ -26,7 +26,7 @@ export function Navbar() {
   if (!currentUser) return null;
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md fixed top-0 w-full z-50">
+    <nav className="bg-white dark:bg-gray-800 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">

@@ -8,64 +8,34 @@ interface ApplicationCardProps {
   application: JobApplication;
   onEdit?: (application: JobApplication) => void;
   onDelete?: (id: string) => void;
-  onStatusChange: (applicationId: string, newStatus: JobApplication['status']) => Promise<void>;
 }
 
-export function ApplicationCard({ application, onEdit, onDelete, onStatusChange }: ApplicationCardProps) {
+export function ApplicationCard({ application, onEdit, onDelete }: ApplicationCardProps) {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'applied':
-        return 'bg-primary text-primary-foreground';
+        return 'bg-blue-500';
       case 'interview':
-        return 'bg-yellow-500 text-white';
+        return 'bg-yellow-500';
       case 'offer':
-        return 'bg-green-500 text-white';
+        return 'bg-green-500';
       case 'rejected':
-        return 'bg-destructive text-destructive-foreground';
+        return 'bg-red-500';
       default:
-        return 'bg-muted text-muted-foreground';
+        return 'bg-gray-500';
     }
   };
 
   return (
-    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out rounded-lg overflow-hidden bg-card text-card-foreground border border-border">
-      <CardHeader className="bg-primary text-primary-foreground p-4 flex justify-between items-start">
+    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out rounded-lg overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-4 flex justify-between items-start">
         <div>
           <CardTitle className="text-xl font-bold mb-1">{application.jobTitle}</CardTitle>
           <p className="text-sm opacity-90">{application.companyName}</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <select
-            value={application.status}
-            onChange={(e) => onStatusChange(application.id, e.target.value as JobApplication['status'])}
-            className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(application.status)}`}
-          >
-            <option value="applied">Applied</option>
-            <option value="interview">Interviewing</option>
-            <option value="offer">Offered</option>
-            <option value="rejected">Rejected</option>
-          </select>
-          {onEdit && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="text-foreground hover:bg-accent hover:text-accent-foreground flex items-center"
-              onClick={() => onEdit(application)}
-            >
-              <Pencil className="w-4 h-4 mr-1" /> Edit
-            </Button>
-          )}
-          {onDelete && (
-            <Button
-              variant="destructive" 
-              size="sm" 
-              className="flex items-center"
-              onClick={() => onDelete(application.id)}
-            >
-              <Trash2 className="w-4 h-4 mr-1" /> Delete
-            </Button>
-          )}
-        </div>
+        <Badge className={getStatusColor(application.status)}>
+          {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+        </Badge>
       </CardHeader>
       <CardContent className="p-4 space-y-3">
         <div className="flex justify-between items-center text-sm text-gray-700">
@@ -84,7 +54,7 @@ export function ApplicationCard({ application, onEdit, onDelete, onStatusChange 
               href={application.resumeLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:text-primary-foreground font-medium flex items-center"
+              className="text-blue-600 hover:text-blue-500 font-medium flex items-center"
             >
               View Resume <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 ml-1"> <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/> </svg>
             </a>
@@ -96,12 +66,34 @@ export function ApplicationCard({ application, onEdit, onDelete, onStatusChange 
               href={application.websiteLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:text-primary-foreground font-medium flex items-center"
+              className="text-blue-600 hover:text-blue-500 font-medium flex items-center"
             >
-              View Website <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 ml-1"> <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/> </svg>
+              View Job Posting <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 ml-1"> <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/> </svg>
             </a>
           </div>
         )}
+        <div className="flex justify-end gap-2 pt-4">
+          {onEdit && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="text-gray-600 hover:bg-gray-100 flex items-center"
+              onClick={() => onEdit(application)}
+            >
+              <Pencil className="w-4 h-4 mr-1" /> Edit
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              variant="destructive" 
+              size="sm" 
+              className="bg-red-500 hover:bg-red-600 text-white flex items-center"
+              onClick={() => onDelete(application.id)}
+            >
+              <Trash2 className="w-4 h-4 mr-1" /> Delete
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
