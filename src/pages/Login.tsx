@@ -12,7 +12,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPasswordSetup, setShowPasswordSetup] = useState(false);
-  const { login, googleSignIn, linkEmailPassword, isGoogleUser, checkEmailProvider } = useAuth();
+  const { signIn, googleSignIn, linkEmailPassword, isGoogleUser, checkEmailProvider } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
@@ -30,7 +30,7 @@ export default function Login() {
         const methods = await checkEmailProvider(email);
         console.log('Sign-in methods for email', email, ':', methods);
 
-        await login(email, password);
+        await signIn(email, password);
         navigate('/');
       }
     } catch (err: any) {

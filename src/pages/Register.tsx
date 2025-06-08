@@ -11,7 +11,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signup } = useAuth();
+  const { signUp } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
@@ -24,7 +24,7 @@ export default function Register() {
     try {
       setError('');
       setLoading(true);
-      await signup(email, password);
+      await signUp(email, password);
       navigate('/');
     } catch (err) {
       setError('Failed to create an account');

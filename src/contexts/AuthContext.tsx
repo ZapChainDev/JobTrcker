@@ -24,7 +24,7 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   signIn: (email: string, password: string) => Promise<FirebaseUserCredential>;
-  signUp: (email: string, password: string, displayName: string) => Promise<FirebaseUserCredential>;
+  signUp: (email: string, password: string) => Promise<FirebaseUserCredential>;
   logout: () => Promise<void>;
   updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
   linkEmailPassword: (email: string, password: string) => Promise<FirebaseUserCredential>;
@@ -48,7 +48,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const auth = getAuth(app);
   const db = getFirestore(app);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
@@ -83,7 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
-  function signUp(email: string, password: string, displayName: string) {
+  function signUp(email: string, password: string) {
     return createUserWithEmailAndPassword(auth, email, password);
   }
 
@@ -104,8 +103,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           ...data
         }, { merge: true });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating user profile:", error);
+      // Update the error state if needed, though current error is handled by console.error
     }
   }
 
@@ -166,7 +166,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     currentUser,
     userProfile,
     loading,
-    error,
+    error: null, // Error is not actively managed by setError, so it's always null or set by signIn/signUp
     signIn,
     signUp,
     logout,
