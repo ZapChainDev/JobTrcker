@@ -14,6 +14,11 @@ export interface UserProfile {
   name?: string;
 }
 
+export interface StatusChange {
+  status: 'applied' | 'interviewing' | 'rejected' | 'offered' | 'accepted';
+  timestamp: Timestamp;
+}
+
 export interface JobApplication {
   id: string;
   userId: string;
@@ -49,6 +54,7 @@ export interface JobApplication {
   nextSteps?: string;
   feedback?: string;
   rejectionReason?: string;
+  statusHistory?: StatusChange[];
   offerDetails?: {
     salary: string;
     benefits: string[];
@@ -56,31 +62,4 @@ export interface JobApplication {
     endDate?: Timestamp;
     notes?: string;
   };
-}
-
-interface StatusChange {
-  status: 'applied' | 'interviewing' | 'rejected' | 'offer';
-  timestamp: Timestamp;
-}
-
-interface JobApplication {
-  id: string;
-  jobTitle: string;
-  companyName: string;
-  applicationDate: string;
-  status: 'applied' | 'interviewing' | 'rejected' | 'offer';
-  notes: string;
-  resumeLink: string;
-  websiteLink: string;
-  statusHistory: StatusChange[];
-}
-
-interface UserProfile {
-  id: string;
-  name: string;
-  age: number;
-  course: string;
-  motivation: string;
-}
-
-export type { StatusChange, JobApplication, UserProfile }; 
+} 

@@ -15,12 +15,14 @@ export function ApplicationCard({ application, onEdit, onDelete }: ApplicationCa
     switch (status.toLowerCase()) {
       case 'applied':
         return 'bg-blue-500';
-      case 'interview':
+      case 'interviewing':
         return 'bg-yellow-500';
-      case 'offer':
+      case 'offered':
         return 'bg-green-500';
       case 'rejected':
         return 'bg-red-500';
+      case 'accepted':
+        return 'bg-purple-500';
       default:
         return 'bg-gray-500';
     }
@@ -30,8 +32,8 @@ export function ApplicationCard({ application, onEdit, onDelete }: ApplicationCa
     <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out rounded-lg overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-4 flex justify-between items-start">
         <div>
-          <CardTitle className="text-xl font-bold mb-1">{application.jobTitle}</CardTitle>
-          <p className="text-sm opacity-90">{application.companyName}</p>
+          <CardTitle className="text-xl font-bold mb-1">{application.position}</CardTitle>
+          <p className="text-sm opacity-90">{application.company}</p>
         </div>
         <Badge className={getStatusColor(application.status)}>
           {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
@@ -40,7 +42,7 @@ export function ApplicationCard({ application, onEdit, onDelete }: ApplicationCa
       <CardContent className="p-4 space-y-3">
         <div className="flex justify-between items-center text-sm text-gray-700">
           <span className="font-medium">Applied:</span>
-          <span>{new Date(application.applicationDate).toLocaleDateString()}</span>
+          <span>{application.appliedDate?.toDate().toLocaleDateString() ?? 'Not specified'}</span>
         </div>
         {application.notes && (
           <div className="text-sm text-gray-700">
@@ -48,22 +50,22 @@ export function ApplicationCard({ application, onEdit, onDelete }: ApplicationCa
             <p className="mt-1 text-gray-600 leading-relaxed">{application.notes}</p>
           </div>
         )}
-        {application.resumeLink && (
+        {application.applicationUrl && (
           <div className="text-sm">
             <a
-              href={application.resumeLink}
+              href={application.applicationUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:text-blue-500 font-medium flex items-center"
             >
-              View Resume <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 ml-1"> <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/> </svg>
+              View Application <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 ml-1"> <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/> </svg>
             </a>
           </div>
         )}
-        {application.websiteLink && (
+        {application.website && (
           <div className="text-sm">
             <a
-              href={application.websiteLink}
+              href={application.website}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:text-blue-500 font-medium flex items-center"

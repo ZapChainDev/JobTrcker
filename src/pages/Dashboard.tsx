@@ -25,12 +25,13 @@ export function Dashboard() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
 
-  const statusCounts = {
+  const [statusCounts, setStatusCounts] = useState({
     applied: 0,
     interviewing: 0,
     rejected: 0,
-    offered: 0
-  };
+    offered: 0,
+    accepted: 0,
+  });
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -40,7 +41,15 @@ export function Dashboard() {
       const q = query(applicationsRef, where('userId', '==', currentUser.uid));
       const querySnapshot = await getDocs(q);
       
-      const applications: JobApplication[] = [];
+      const fetchedApplications: JobApplication[] = [];
+      const newStatusCounts = {
+        applied: 0,
+        interviewing: 0,
+        rejected: 0,
+        offered: 0,
+        accepted: 0,
+      };
+
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const application = {
@@ -48,27 +57,33 @@ export function Dashboard() {
           ...data
         } as JobApplication;
         
-        applications.push(application);
+        fetchedApplications.push(application);
         
+        console.log("Application status fetched: ", application.status);
+
         // Update status counts
         switch (application.status) {
           case 'applied':
-            statusCounts.applied++;
+            newStatusCounts.applied++;
             break;
           case 'interviewing':
-            statusCounts.interviewing++;
+            newStatusCounts.interviewing++;
             break;
           case 'rejected':
-            statusCounts.rejected++;
+            newStatusCounts.rejected++;
             break;
           case 'offered':
-            statusCounts.offered++;
+            newStatusCounts.offered++;
+            break;
+          case 'accepted':
+            newStatusCounts.accepted++;
             break;
         }
       });
       
-      setApplications(applications);
-      setFilteredApplications(applications);
+      setApplications(fetchedApplications);
+      setFilteredApplications(fetchedApplications);
+      setStatusCounts(newStatusCounts); // Update the state with new counts
       setIsLoading(false);
     };
 
@@ -79,7 +94,7 @@ export function Dashboard() {
     let filtered = applications;
 
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(app => app.status === statusFilter);
+      filtered = filtered.filter(app => app.status.toLowerCase() === statusFilter.toLowerCase());
     }
 
     if (searchQuery) {
@@ -137,6 +152,14 @@ export function Dashboard() {
 
         const querySnapshot = await getDocs(q);
         const applications: JobApplication[] = [];
+        const newStatusCounts = {
+          applied: 0,
+          interviewing: 0,
+          rejected: 0,
+          offered: 0,
+          accepted: 0,
+        };
+
         querySnapshot.forEach((doc) => {
           const data = doc.data();
           const application = {
@@ -146,24 +169,30 @@ export function Dashboard() {
           
           applications.push(application);
           
+          console.log("Application status fetched: ", application.status);
+
           // Update status counts
           switch (application.status) {
             case 'applied':
-              statusCounts.applied++;
+              newStatusCounts.applied++;
               break;
             case 'interviewing':
-              statusCounts.interviewing++;
+              newStatusCounts.interviewing++;
               break;
             case 'rejected':
-              statusCounts.rejected++;
+              newStatusCounts.rejected++;
               break;
             case 'offered':
-              statusCounts.offered++;
+              newStatusCounts.offered++;
+              break;
+            case 'accepted':
+              newStatusCounts.accepted++;
               break;
           }
         });
         setApplications(applications);
         setFilteredApplications(applications);
+        setStatusCounts(newStatusCounts);
       } catch (error) {
         console.error('Error refreshing applications:', error);
       }
@@ -221,6 +250,12 @@ export function Dashboard() {
                 {statusCounts.offered}
               </CardContent>
             </Card>
+            <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
+              <CardTitle className="text-lg font-semibold text-gray-700">Accepted</CardTitle>
+              <CardContent className="text-4xl font-bold text-purple-600 mt-2">
+                {statusCounts.accepted}
+              </CardContent>
+            </Card>
           </div>
 
           <div className="flex flex-col md:flex-row gap-4 mb-8 items-center">
@@ -240,6 +275,7 @@ export function Dashboard() {
                 <SelectItem value="interviewing">Interviewing</SelectItem>
                 <SelectItem value="rejected">Rejected</SelectItem>
                 <SelectItem value="offered">Offer</SelectItem>
+                <SelectItem value="accepted">Accepted</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -254,18 +290,12 @@ export function Dashboard() {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredApplications.map((application) => (
-              <div key={application.id}>
-                <h3>{application.position}</h3>
-                <p>{application.company}</p>
-                <p>Status: {application.status}</p>
-                <p>Applied: {application.appliedDate.toDate().toLocaleDateString()}</p>
-                {application.website && (
-                  <a href={application.website} target="_blank" rel="noopener noreferrer">
-                    Company Website
-                  </a>
-                )}
-                {application.notes && <p>Notes: {application.notes}</p>}
-              </div>
+              <ApplicationCard 
+                key={application.id} 
+                application={application}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         </TabsContent>

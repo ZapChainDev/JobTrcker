@@ -17,24 +17,24 @@ interface ApplicationFormProps {
 }
 
 interface ApplicationFormData {
-  jobTitle: string;
-  companyName: string;
-  applicationDate: string;
-  status: 'applied' | 'interviewing' | 'rejected' | 'offer';
+  position: string;
+  company: string;
+  appliedDate: string;
+  status: 'applied' | 'interviewing' | 'rejected' | 'offered' | 'accepted';
   notes: string;
-  resumeLink: string;
-  websiteLink: string;
+  applicationUrl: string;
+  website: string;
 }
 
 export default function ApplicationForm({ open, onOpenChange, application, onSuccess }: ApplicationFormProps) {
   const [formData, setFormData] = useState<ApplicationFormData>({
-    jobTitle: '',
-    companyName: '',
-    applicationDate: new Date().toISOString().split('T')[0],
+    position: '',
+    company: '',
+    appliedDate: new Date().toISOString().split('T')[0],
     status: 'applied',
     notes: '',
-    resumeLink: '',
-    websiteLink: '',
+    applicationUrl: '',
+    website: '',
   });
   const [loading, setLoading] = useState(false);
   const { currentUser } = useAuth();
@@ -42,23 +42,23 @@ export default function ApplicationForm({ open, onOpenChange, application, onSuc
   useEffect(() => {
     if (application) {
       setFormData({
-        jobTitle: application.jobTitle,
-        companyName: application.companyName,
-        applicationDate: application.applicationDate,
-        status: application.status,
-        notes: application.notes,
-        resumeLink: application.resumeLink,
-        websiteLink: application.websiteLink || '',
+        position: application.position || '',
+        company: application.company || '',
+        appliedDate: application.appliedDate ? application.appliedDate.toDate().toISOString().split('T')[0] : '',
+        status: application.status || 'applied',
+        notes: application.notes || '',
+        applicationUrl: application.applicationUrl || '',
+        website: application.website || '',
       });
     } else {
       setFormData({
-        jobTitle: '',
-        companyName: '',
-        applicationDate: new Date().toISOString().split('T')[0],
+        position: '',
+        company: '',
+        appliedDate: new Date().toISOString().split('T')[0],
         status: 'applied',
         notes: '',
-        resumeLink: '',
-        websiteLink: '',
+        applicationUrl: '',
+        website: '',
       });
     }
   }, [application]);
@@ -71,6 +71,7 @@ export default function ApplicationForm({ open, onOpenChange, application, onSuc
     try {
       const commonData = {
         ...formData,
+        appliedDate: Timestamp.fromDate(new Date(formData.appliedDate)),
         userId: currentUser.uid,
       };
 
@@ -117,39 +118,39 @@ export default function ApplicationForm({ open, onOpenChange, application, onSuc
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="position" className="block text-sm font-medium text-gray-700">
               Job Title
             </label>
             <Input
-              id="jobTitle"
+              id="position"
               required
-              value={formData.jobTitle}
-              onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+              value={formData.position}
+              onChange={(e) => setFormData({ ...formData, position: e.target.value })}
             />
           </div>
 
           <div>
-            <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="company" className="block text-sm font-medium text-gray-700">
               Company Name
             </label>
             <Input
-              id="companyName"
+              id="company"
               required
-              value={formData.companyName}
-              onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+              value={formData.company}
+              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
             />
           </div>
 
           <div>
-            <label htmlFor="applicationDate" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="appliedDate" className="block text-sm font-medium text-gray-700">
               Application Date
             </label>
             <Input
-              id="applicationDate"
+              id="appliedDate"
               type="date"
               required
-              value={formData.applicationDate}
-              onChange={(e) => setFormData({ ...formData, applicationDate: e.target.value })}
+              value={formData.appliedDate}
+              onChange={(e) => setFormData({ ...formData, appliedDate: e.target.value })}
             />
           </div>
 
@@ -168,7 +169,7 @@ export default function ApplicationForm({ open, onOpenChange, application, onSuc
                 <SelectItem value="applied">Applied</SelectItem>
                 <SelectItem value="interviewing">Interviewing</SelectItem>
                 <SelectItem value="rejected">Rejected</SelectItem>
-                <SelectItem value="offer">Offer</SelectItem>
+                <SelectItem value="offered">Offer</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -186,27 +187,27 @@ export default function ApplicationForm({ open, onOpenChange, application, onSuc
           </div>
 
           <div>
-            <label htmlFor="resumeLink" className="block text-sm font-medium text-gray-700">
-              Resume Link
+            <label htmlFor="applicationUrl" className="block text-sm font-medium text-gray-700">
+              Application Link
             </label>
             <Input
-              id="resumeLink"
+              id="applicationUrl"
               type="url"
-              value={formData.resumeLink}
-              onChange={(e) => setFormData({ ...formData, resumeLink: e.target.value })}
+              value={formData.applicationUrl}
+              onChange={(e) => setFormData({ ...formData, applicationUrl: e.target.value })}
               placeholder="https://..."
             />
           </div>
 
           <div>
-            <label htmlFor="websiteLink" className="block text-sm font-medium text-gray-700">
-              Job Posting Link
+            <label htmlFor="website" className="block text-sm font-medium text-gray-700">
+              Company Website
             </label>
             <Input
-              id="websiteLink"
+              id="website"
               type="url"
-              value={formData.websiteLink}
-              onChange={(e) => setFormData({ ...formData, websiteLink: e.target.value })}
+              value={formData.website}
+              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
               placeholder="https://..."
             />
           </div>
@@ -216,7 +217,7 @@ export default function ApplicationForm({ open, onOpenChange, application, onSuc
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : application ? 'Update' : 'Add Application'}
+              {loading ? 'Saving...' : application ? 'Save Changes' : 'Add Application'}
             </Button>
           </div>
         </form>
