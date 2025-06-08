@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import { ProfileSetup } from './components/ProfileSetup';
+import Profile from './pages/Profile';
 
 console.log("Test Message from .env:", import.meta.env.VITE_TEST_MESSAGE);
 
@@ -28,6 +29,10 @@ function App() {
               <Navigate to="/login" />
             )
           }
+        />
+        <Route
+          path="/profile"
+          element={currentUser ? <Profile /> : <Navigate to="/login" />}
         />
         <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>
