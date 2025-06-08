@@ -127,7 +127,16 @@ export default function Login() {
                 <span>Continue with Google</span>
               </Button>
             </CardContent>
-            <CardFooter className="flex justify-center pt-8">
+            <CardFooter className="flex flex-col items-center pt-8 space-y-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">Contact me:</p>
+              <div className="flex justify-center space-x-4 mb-4">
+                <a href="https://www.facebook.com/johnmark.papiliren.3/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
+                  <Facebook size={24} />
+                </a>
+                <a href="https://www.linkedin.com/in/john-mark-papelirin-124085253/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
+                  <Linkedin size={24} />
+                </a>
+              </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Don't have an account?{' '}
                 <Link to="/register" className="font-medium text-purple-600 hover:text-purple-500 transition duration-150 ease-in-out">
@@ -136,19 +145,6 @@ export default function Login() {
               </p>
             </CardFooter>
           </Card>
-
-          {/* Social Media Footer */}
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end space-y-2">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Contact me:</p>
-            <div className="flex flex-col space-y-2">
-              <a href="https://www.facebook.com/johnmark.papiliren.3/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
-                <Facebook size={24} />
-              </a>
-              <a href="https://www.linkedin.com/in/john-mark-papelirin-124085253/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
-                <Linkedin size={24} />
-              </a>
-            </div>
-          </div>
         </div>
       </div>
     </div>
