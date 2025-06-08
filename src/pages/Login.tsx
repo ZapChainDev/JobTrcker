@@ -126,19 +126,17 @@ export default function Login() {
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon" className="w-5 h-5" />
                 <span>Continue with Google</span>
               </Button>
-              <div className="mt-8 text-center text-gray-500 dark:text-gray-400">
-                <p className="mb-2">Contact me:</p>
-                <div className="flex justify-center space-x-4">
-                  <a href="https://www.facebook.com/johnmark.papiliren.3/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
-                    <Facebook size={24} />
-                  </a>
-                  <a href="https://www.linkedin.com/in/john-mark-papelirin-124085253/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
-                    <Linkedin size={24} />
-                  </a>
-                </div>
-              </div>
             </CardContent>
-            <CardFooter className="flex justify-center pt-8">
+            <CardFooter className="flex flex-col items-center pt-8 space-y-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">Contact me:</p>
+              <div className="flex justify-center space-x-4 mb-4">
+                <a href="https://www.facebook.com/johnmark.papiliren.3/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
+                  <Facebook size={24} />
+                </a>
+                <a href="https://www.linkedin.com/in/john-mark-papelirin-124085253/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
+                  <Linkedin size={24} />
+                </a>
+              </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Don't have an account?{' '}
                 <Link to="/register" className="font-medium text-purple-600 hover:text-purple-500 transition duration-150 ease-in-out">
