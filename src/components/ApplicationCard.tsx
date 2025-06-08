@@ -8,9 +8,10 @@ interface ApplicationCardProps {
   application: JobApplication;
   onEdit?: (application: JobApplication) => void;
   onDelete?: (id: string) => void;
+  onStatusChange: (applicationId: string, newStatus: JobApplication['status']) => Promise<void>;
 }
 
-export function ApplicationCard({ application, onEdit, onDelete }: ApplicationCardProps) {
+export function ApplicationCard({ application, onEdit, onDelete, onStatusChange }: ApplicationCardProps) {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'applied':
@@ -33,9 +34,38 @@ export function ApplicationCard({ application, onEdit, onDelete }: ApplicationCa
           <CardTitle className="text-xl font-bold mb-1">{application.jobTitle}</CardTitle>
           <p className="text-sm opacity-90">{application.companyName}</p>
         </div>
-        <Badge className={getStatusColor(application.status)}>
-          {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
-        </Badge>
+        <div className="flex items-center space-x-2">
+          <select
+            value={application.status}
+            onChange={(e) => onStatusChange(application.id, e.target.value as JobApplication['status'])}
+            className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(application.status)}`}
+          >
+            <option value="applied">Applied</option>
+            <option value="interview">Interviewing</option>
+            <option value="offer">Offered</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          {onEdit && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="text-foreground hover:bg-accent hover:text-accent-foreground flex items-center"
+              onClick={() => onEdit(application)}
+            >
+              <Pencil className="w-4 h-4 mr-1" /> Edit
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              variant="destructive" 
+              size="sm" 
+              className="flex items-center"
+              onClick={() => onDelete(application.id)}
+            >
+              <Trash2 className="w-4 h-4 mr-1" /> Delete
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="p-4 space-y-3">
         <div className="flex justify-between items-center text-sm text-gray-700">
@@ -72,28 +102,6 @@ export function ApplicationCard({ application, onEdit, onDelete }: ApplicationCa
             </a>
           </div>
         )}
-        <div className="mt-4 flex justify-end space-x-2">
-          {onEdit && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="text-foreground hover:bg-accent hover:text-accent-foreground flex items-center"
-              onClick={() => onEdit(application)}
-            >
-              <Pencil className="w-4 h-4 mr-1" /> Edit
-            </Button>
-          )}
-          {onDelete && (
-            <Button
-              variant="destructive" 
-              size="sm" 
-              className="flex items-center"
-              onClick={() => onDelete(application.id)}
-            >
-              <Trash2 className="w-4 h-4 mr-1" /> Delete
-            </Button>
-          )}
-        </div>
       </CardContent>
     </Card>
   );
