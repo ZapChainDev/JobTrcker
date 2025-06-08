@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import LeftPanelImage from '@/assets/leftpanelimage.png';
+import { Facebook, Linkedin } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -135,6 +136,17 @@ export default function Login() {
           </CardFooter>
         </Card>
       </div>
+      <footer className="mt-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+        <p className="mb-2">Contact me:</p>
+        <div className="flex justify-center space-x-4">
+          <a href="https://www.facebook.com/johnmark.papiliren.3/" target="_blank" rel="noopener noreferrer" className="hover:text-purple-600 transition duration-150 ease-in-out">
+            <Facebook size={24} />
+          </a>
+          <a href="https://www.linkedin.com/in/john-mark-papelirin-124085253/" target="_blank" rel="noopener noreferrer" className="hover:text-purple-600 transition duration-150 ease-in-out">
+            <Linkedin size={24} />
+          </a>
+        </div>
+      </footer>
     </div>
   );
 } 
