@@ -49,6 +49,14 @@ export default function Login() {
           </h2>
           <p className="mt-2 text-sm text-gray-600">Sign in to your JobTrackr account</p>
         </CardHeader>
+        <div className="px-6 py-4 text-center text-gray-700 bg-gray-50 rounded-lg border border-gray-100 mb-4">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Manage Your Job Search with Ease</h3>
+          <p className="text-sm leading-relaxed">
+            JobTrackr helps you organize your job applications, track statuses, and never miss an update.
+            Streamline your search, from application to offer, all in one place.
+            Securely powered by Firebase and designed for a smooth user experience.
+          </p>
+        </div>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
