@@ -1,23 +1,20 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { 
+import {
   getAuth,
   User as FirebaseUser,
   UserCredential as FirebaseUserCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut,
+  signOut as firebaseSignOut,
   onAuthStateChanged,
   signInWithPopup,
   updateProfile,
-  updateEmail,
-  updatePassword,
   EmailAuthProvider,
-  reauthenticateWithCredential,
   linkWithCredential,
   GoogleAuthProvider,
   fetchSignInMethodsForEmail
 } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { app } from '../lib/firebase';
 import { UserProfile } from '../lib/types';
 
@@ -30,7 +27,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, displayName: string) => Promise<FirebaseUserCredential>;
   logout: () => Promise<void>;
   updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
-  linkEmailPassword: (email: string, password: string) => Promise<void>;
+  linkEmailPassword: (email: string, password: string) => Promise<FirebaseUserCredential>;
   refreshUserProfile: () => Promise<void>;
   googleSignIn: () => Promise<FirebaseUserCredential>;
   isGoogleUser: boolean;
@@ -55,6 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const auth = getAuth(app);
   const db = getFirestore(app);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
+  const googleProvider = new GoogleAuthProvider();
 
   const fetchAndSetUserProfile = async (user: FirebaseUser) => {
     try {
@@ -90,7 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   async function logout() {
-    await signOut(auth);
+    await firebaseSignOut(auth);
   }
 
   async function updateUserProfile(data: Partial<UserProfile>) {
@@ -99,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      await updateProfile(currentUser, data);
+      await updateProfile(currentUser, data as any);
       if (userProfile) {
         await setDoc(doc(db, 'userProfiles', currentUser.uid), {
           ...userProfile,
@@ -116,19 +114,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw new Error('No user is currently signed in');
     }
 
-    // Check if the email matches the current user's email
     if (email !== currentUser.email) {
       throw new Error('Email must match your Google account email');
     }
 
     try {
-      // Create email/password credential
       const credential = EmailAuthProvider.credential(email, password);
-      
-      // Link the credential to the current user
       const result = await linkWithCredential(currentUser, credential);
       
-      // Update user profile to indicate email/password is now available
       const userRef = doc(db, 'userProfiles', currentUser.uid);
       await setDoc(userRef, {
         hasEmailPassword: true,
@@ -155,13 +148,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setCurrentUser(user);
       if (user) {
         await fetchAndSetUserProfile(user);
-        // Check if the user signed in with Google
         const isGoogle = user.providerData.some(
           provider => provider.providerId === GoogleAuthProvider.PROVIDER_ID
         );
         setIsGoogleUser(isGoogle);
       } else {
-        setUserProfile(undefined);
+        setUserProfile(null);
         setIsGoogleUser(false);
       }
       setLoading(false);
@@ -191,4 +183,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       {!loading && children}
     </AuthContext.Provider>
   );
-} 
+}; 

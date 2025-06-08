@@ -1,110 +1,108 @@
 import { useState } from 'react';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import { JobApplication } from '../lib/types';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-
-type ValuePiece = Date | null;
-type Value = ValuePiece | [ValuePiece, ValuePiece];
+import { JobApplication } from '@/lib/types';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface CalendarViewProps {
   applications: JobApplication[];
 }
 
 export function CalendarView({ applications }: CalendarViewProps) {
-  const [value, setValue] = useState<Value>(new Date());
+  const [selectedEvent, setSelectedEvent] = useState<JobApplication | null>(null);
+  const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
 
-  // Create a map of dates to application counts
-  const applicationDates = applications.reduce((acc, app) => {
-    const date = new Date(app.applicationDate).toDateString();
-    acc[date] = (acc[date] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'applied':
+        return 'bg-blue-500';
+      case 'interviewing':
+        return 'bg-yellow-500';
+      case 'offered':
+        return 'bg-green-500';
+      case 'rejected':
+        return 'bg-red-500';
+      case 'accepted':
+        return 'bg-purple-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
 
-  // Get applications for the selected date
-  const selectedDate = value instanceof Date ? value : null;
-  const selectedDateApplications = selectedDate
-    ? applications.filter(
-        (app) =>
-          new Date(app.applicationDate).toDateString() ===
-          selectedDate.toDateString()
-      )
-    : [];
+  const events = applications.map(app => {
+    const eventDate = app.interviewDate || app.appliedDate;
+    
+    if (eventDate) {
+      return {
+        id: app.id,
+        title: `${app.position} at ${app.company} (${app.status})`,
+        start: eventDate.toDate().toISOString().split('T')[0],
+        extendedProps: {
+          application: app,
+        },
+        color: getStatusColor(app.status).replace('bg-', '#').replace('-500', '500'),
+      };
+    }
+    return null;
+  }).filter(Boolean) as any[];
+
+  const handleEventClick = (clickInfo: any) => {
+    setSelectedEvent(clickInfo.event.extendedProps.application);
+    setIsEventDetailsOpen(true);
+  };
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Application Calendar</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="w-full md:w-1/2">
-              <Calendar
-                onChange={setValue}
-                value={value}
-                tileContent={({ date }) => {
-                  const dateStr = date.toDateString();
-                  const count = applicationDates[dateStr];
-                  return count ? (
-                    <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
-                      <Badge variant="secondary" className="text-xs">
-                        {count}
-                      </Badge>
-                    </div>
-                  ) : null;
-                }}
-                className="w-full border rounded-lg"
-              />
-            </div>
-            <div className="w-full md:w-1/2">
-              {selectedDate && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">
-                    Applications on {selectedDate.toLocaleDateString()}
-                  </h3>
-                  {selectedDateApplications.length > 0 ? (
-                    <div className="space-y-2">
-                      {selectedDateApplications.map((app) => (
-                        <Card key={app.id}>
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h4 className="font-medium">{app.companyName}</h4>
-                                <p className="text-sm text-muted-foreground">
-                                  {app.jobTitle}
-                                </p>
-                              </div>
-                              <Badge
-                                variant={
-                                  app.status === 'applied'
-                                    ? 'default'
-                                    : app.status === 'interviewing'
-                                    ? 'secondary'
-                                    : app.status === 'offer'
-                                    ? 'outline'
-                                    : 'destructive'
-                                }
-                              >
-                                {app.status}
-                              </Badge>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground">
-                      No applications on this date
-                    </p>
-                  )}
-                </div>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold">Application Calendar</h2>
+      <FullCalendar
+        plugins={[dayGridPlugin, interactionPlugin]}
+        initialView="dayGridMonth"
+        events={events}
+        eventClick={handleEventClick}
+        headerToolbar={{
+          left: 'prev,next today',
+          center: 'title',
+          right: '',
+        }}
+        height="auto"
+        eventContent={(arg) => (
+          <div className="text-xs truncate flex items-center">
+            <span className="w-2 h-2 rounded-full mr-1" style={{ backgroundColor: arg.backgroundColor }}></span>
+            <span className="font-medium">{arg.event.title}</span>
+          </div>
+        )}
+      />
+
+      <Dialog open={isEventDetailsOpen} onOpenChange={setIsEventDetailsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{selectedEvent?.position} at {selectedEvent?.company}</DialogTitle>
+          </DialogHeader>
+          {selectedEvent && (
+            <div className="space-y-3 text-sm">
+              <p><strong>Status:</strong> <Badge className={getStatusColor(selectedEvent.status)}>{selectedEvent.status}</Badge></p>
+              <p><strong>Applied Date:</strong> {selectedEvent.appliedDate?.toDate().toLocaleDateString() ?? 'N/A'}</p>
+              {selectedEvent.interviewDate && (
+                <p><strong>Interview Date:</strong> {selectedEvent.interviewDate.toDate().toLocaleDateString()}</p>
+              )}
+              {selectedEvent.notes && (
+                <p><strong>Notes:</strong> {selectedEvent.notes}</p>
+              )}
+              {selectedEvent.applicationUrl && (
+                <p><strong>Application Link:</strong> <a href={selectedEvent.applicationUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View Application</a></p>
+              )}
+              {selectedEvent.website && (
+                <p><strong>Company Website:</strong> <a href={selectedEvent.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Visit Website</a></p>
               )}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          )}
+          <Button onClick={() => setIsEventDetailsOpen(false)}>Close</Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 

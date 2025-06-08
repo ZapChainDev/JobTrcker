@@ -27,10 +27,10 @@ export function ProfileSetup() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const profile = docSnap.data() as UserProfile;
-          setName(profile.name);
-          setAge(profile.age);
-          setCourse(profile.course);
-          setMotivation(profile.motivation);
+          setName(profile.name || '');
+          setAge(profile.age ? Number(profile.age) : '');
+          setCourse(profile.course || '');
+          setMotivation(profile.motivation || '');
         }
       } else {
         navigate('/login');
@@ -60,9 +60,13 @@ export function ProfileSetup() {
     try {
       const userRef = doc(db, 'userProfiles', auth.currentUser.uid);
       const userProfile: UserProfile = {
-        id: auth.currentUser.uid,
+        uid: auth.currentUser.uid,
+        email: auth.currentUser.email || '',
+        displayName: auth.currentUser.displayName || name,
+        createdAt: new Date().toISOString() as any,
+        updatedAt: new Date().toISOString() as any,
         name,
-        age,
+        age: String(age),
         course,
         motivation,
       };
