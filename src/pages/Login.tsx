@@ -44,7 +44,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="flex w-full max-w-4xl bg-white dark:bg-gray-800 shadow-2xl rounded-2xl relative">
+      <div className="flex w-full max-w-4xl h-[600px] bg-white dark:bg-gray-800 shadow-2xl rounded-2xl overflow-hidden">
         {/* Left pane for image and testimonial */}
         <div className="hidden md:block w-1/2 h-full bg-cover bg-center relative" style={{ backgroundImage: `url(${LeftPanelImage})` }}>
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
@@ -62,7 +62,7 @@ export default function Login() {
         </div>
 
         {/* Right pane for login form */}
-        <div className="w-full md:w-1/2">
+        <div className="w-full md:w-1/2 relative">
           <Card className="w-full p-8 space-y-8 bg-white dark:bg-gray-800 shadow-none border-none rounded-none">
             <CardHeader className="text-center md:text-left">
               <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white mb-2">
@@ -126,6 +126,17 @@ export default function Login() {
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google icon" className="w-5 h-5" />
                 <span>Continue with Google</span>
               </Button>
+              <div className="mt-8 text-center text-gray-500 dark:text-gray-400">
+                <p className="mb-2">Contact me:</p>
+                <div className="flex justify-center space-x-4">
+                  <a href="https://www.facebook.com/johnmark.papiliren.3/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
+                    <Facebook size={24} />
+                  </a>
+                  <a href="https://www.linkedin.com/in/john-mark-papelirin-124085253/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
+                    <Linkedin size={24} />
+                  </a>
+                </div>
+              </div>
             </CardContent>
             <CardFooter className="flex justify-center pt-8">
               <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -136,18 +147,6 @@ export default function Login() {
               </p>
             </CardFooter>
           </Card>
-        </div>
-        {/* Social Media Footer - Adjusted position relative to main container */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end space-y-2">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Contact me:</p>
-          <div className="flex flex-col space-y-2">
-            <a href="https://www.facebook.com/johnmark.papiliren.3/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
-              <Facebook size={24} />
-            </a>
-            <a href="https://www.linkedin.com/in/john-mark-papelirin-124085253/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-purple-600 transition duration-150 ease-in-out">
-              <Linkedin size={24} />
-            </a>
-          </div>
         </div>
       </div>
     </div>
