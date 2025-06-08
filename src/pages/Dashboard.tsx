@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { CalendarView } from '../components/CalendarView';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { ApplicationCard } from '../components/ApplicationCard';
+import Profile from './Profile';
 
 export function Dashboard() {
   const { currentUser } = useAuth();
@@ -134,7 +135,7 @@ export function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="container mx-auto p-4 space-y-6 bg-background text-foreground">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">JobTrackr Dashboard</h1>
         <Button variant="outline" onClick={handleSignOut}>
@@ -146,32 +147,33 @@ export function Dashboard() {
         <TabsList>
           <TabsTrigger value="list">List View</TabsTrigger>
           <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+          <TabsTrigger value="profile">Profile</TabsTrigger>
         </TabsList>
 
         <TabsContent value="list" className="space-y-4">
           {/* Analytics Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
-              <CardTitle className="text-lg font-semibold text-gray-700">Total Applications</CardTitle>
-              <CardContent className="text-4xl font-bold text-blue-600 mt-2">
+            <Card className="bg-card text-card-foreground shadow-lg rounded-lg p-4 text-center">
+              <CardTitle className="text-lg font-semibold">Total Applications</CardTitle>
+              <CardContent className="text-4xl font-bold text-primary mt-2">
                 {totalApplications}
               </CardContent>
             </Card>
-            <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
-              <CardTitle className="text-lg font-semibold text-gray-700">Applied</CardTitle>
-              <CardContent className="text-4xl font-bold text-blue-600 mt-2">
+            <Card className="bg-card text-card-foreground shadow-lg rounded-lg p-4 text-center">
+              <CardTitle className="text-lg font-semibold">Applied</CardTitle>
+              <CardContent className="text-4xl font-bold text-primary mt-2">
                 {statusCounts.applied}
               </CardContent>
             </Card>
-            <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
-              <CardTitle className="text-lg font-semibold text-gray-700">Interviewing</CardTitle>
-              <CardContent className="text-4xl font-bold text-yellow-600 mt-2">
+            <Card className="bg-card text-card-foreground shadow-lg rounded-lg p-4 text-center">
+              <CardTitle className="text-lg font-semibold">Interviewing</CardTitle>
+              <CardContent className="text-4xl font-bold text-yellow-500 mt-2">
                 {statusCounts.interviewing}
               </CardContent>
             </Card>
-            <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
-              <CardTitle className="text-lg font-semibold text-gray-700">Offer</CardTitle>
-              <CardContent className="text-4xl font-bold text-green-600 mt-2">
+            <Card className="bg-card text-card-foreground shadow-lg rounded-lg p-4 text-center">
+              <CardTitle className="text-lg font-semibold">Offer</CardTitle>
+              <CardContent className="text-4xl font-bold text-green-500 mt-2">
                 {statusCounts.offer}
               </CardContent>
             </Card>
@@ -182,10 +184,10 @@ export function Dashboard() {
               placeholder="Search by job title or company..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="max-w-md md:flex-1 p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
+              className="max-w-md md:flex-1 p-2 border border-border rounded-lg shadow-sm focus:ring focus:ring-ring focus:border-input"
             />
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-[200px] p-2 border border-gray-300 rounded-lg shadow-sm">
+              <SelectTrigger className="w-full md:w-[200px] p-2 border border-border rounded-lg shadow-sm">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -220,6 +222,10 @@ export function Dashboard() {
 
         <TabsContent value="calendar">
           <CalendarView applications={applications} />
+        </TabsContent>
+
+        <TabsContent value="profile">
+          <Profile />
         </TabsContent>
       </Tabs>
 

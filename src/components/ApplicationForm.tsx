@@ -23,6 +23,7 @@ interface ApplicationFormData {
   status: 'applied' | 'interviewing' | 'rejected' | 'offer';
   notes: string;
   resumeLink: string;
+  websiteLink?: string;
 }
 
 export default function ApplicationForm({ open, onOpenChange, application, onSuccess }: ApplicationFormProps) {
@@ -33,6 +34,7 @@ export default function ApplicationForm({ open, onOpenChange, application, onSuc
     status: 'applied',
     notes: '',
     resumeLink: '',
+    websiteLink: '',
   });
   const [loading, setLoading] = useState(false);
   const { currentUser } = useAuth();
@@ -46,6 +48,7 @@ export default function ApplicationForm({ open, onOpenChange, application, onSuc
         status: application.status,
         notes: application.notes,
         resumeLink: application.resumeLink,
+        websiteLink: application.websiteLink || '',
       });
     } else {
       setFormData({
@@ -55,6 +58,7 @@ export default function ApplicationForm({ open, onOpenChange, application, onSuc
         status: 'applied',
         notes: '',
         resumeLink: '',
+        websiteLink: '',
       });
     }
   }, [application]);
@@ -194,7 +198,20 @@ export default function ApplicationForm({ open, onOpenChange, application, onSuc
             />
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div>
+            <label htmlFor="websiteLink" className="block text-sm font-medium text-gray-700">
+              Website Link
+            </label>
+            <Input
+              id="websiteLink"
+              type="url"
+              value={formData.websiteLink}
+              onChange={(e) => setFormData({ ...formData, websiteLink: e.target.value })}
+              placeholder="https://www.example.com"
+            />
+          </div>
+
+          <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>

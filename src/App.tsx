@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import { ProfileSetup } from './components/ProfileSetup';
 import Profile from './pages/Profile';
+import { Navbar } from './components/Navbar';
 
 console.log("Test Message from .env:", import.meta.env.VITE_TEST_MESSAGE);
 
@@ -13,29 +14,32 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/login" element={!currentUser ? <Login /> : <Navigate to="/dashboard" />} />
-        <Route path="/register" element={!currentUser ? <Register /> : <Navigate to="/dashboard" />} />
-        <Route
-          path="/dashboard"
-          element={
-            currentUser ? (
-              userProfile ? (
-                <Dashboard />
+      {currentUser && <Navbar />}
+      <div className="pt-16">
+        <Routes>
+          <Route path="/login" element={!currentUser ? <Login /> : <Navigate to="/dashboard" />} />
+          <Route path="/register" element={!currentUser ? <Register /> : <Navigate to="/dashboard" />} />
+          <Route
+            path="/dashboard"
+            element={
+              currentUser ? (
+                userProfile ? (
+                  <Dashboard />
+                ) : (
+                  <ProfileSetup />
+                )
               ) : (
-                <ProfileSetup />
+                <Navigate to="/login" />
               )
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-        <Route
-          path="/profile"
-          element={currentUser ? <Profile /> : <Navigate to="/login" />}
-        />
-        <Route path="/" element={<Navigate to="/dashboard" />} />
-      </Routes>
+            }
+          />
+          <Route
+            path="/profile"
+            element={currentUser ? <Profile /> : <Navigate to="/login" />}
+          />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+        </Routes>
+      </div>
     </Router>
   );
 }

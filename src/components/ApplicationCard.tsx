@@ -14,21 +14,21 @@ export function ApplicationCard({ application, onEdit, onDelete }: ApplicationCa
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'applied':
-        return 'bg-blue-500';
+        return 'bg-primary text-primary-foreground';
       case 'interview':
-        return 'bg-yellow-500';
+        return 'bg-yellow-500 text-white';
       case 'offer':
-        return 'bg-green-500';
+        return 'bg-green-500 text-white';
       case 'rejected':
-        return 'bg-red-500';
+        return 'bg-destructive text-destructive-foreground';
       default:
-        return 'bg-gray-500';
+        return 'bg-muted text-muted-foreground';
     }
   };
 
   return (
-    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out rounded-lg overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-4 flex justify-between items-start">
+    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out rounded-lg overflow-hidden bg-card text-card-foreground border border-border">
+      <CardHeader className="bg-primary text-primary-foreground p-4 flex justify-between items-start">
         <div>
           <CardTitle className="text-xl font-bold mb-1">{application.jobTitle}</CardTitle>
           <p className="text-sm opacity-90">{application.companyName}</p>
@@ -54,18 +54,30 @@ export function ApplicationCard({ application, onEdit, onDelete }: ApplicationCa
               href={application.resumeLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-500 font-medium flex items-center"
+              className="text-primary hover:text-primary-foreground font-medium flex items-center"
             >
               View Resume <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 ml-1"> <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/> </svg>
             </a>
           </div>
         )}
-        <div className="flex justify-end gap-2 pt-4">
+        {application.websiteLink && (
+          <div className="text-sm">
+            <a
+              href={application.websiteLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:text-primary-foreground font-medium flex items-center"
+            >
+              View Website <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4 ml-1"> <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/> </svg>
+            </a>
+          </div>
+        )}
+        <div className="mt-4 flex justify-end space-x-2">
           {onEdit && (
             <Button 
               variant="outline" 
               size="sm" 
-              className="text-gray-600 hover:bg-gray-100 flex items-center"
+              className="text-foreground hover:bg-accent hover:text-accent-foreground flex items-center"
               onClick={() => onEdit(application)}
             >
               <Pencil className="w-4 h-4 mr-1" /> Edit
@@ -75,7 +87,7 @@ export function ApplicationCard({ application, onEdit, onDelete }: ApplicationCa
             <Button
               variant="destructive" 
               size="sm" 
-              className="bg-red-500 hover:bg-red-600 text-white flex items-center"
+              className="flex items-center"
               onClick={() => onDelete(application.id)}
             >
               <Trash2 className="w-4 h-4 mr-1" /> Delete

@@ -21,13 +21,13 @@ interface AuthContextType {
   loading: boolean;
   signup: (email: string, password: string) => Promise<UserCredential>;
   login: (email: string, password: string) => Promise<UserCredential>;
-  logout: () => Promise<void>;
   googleSignIn: () => Promise<UserCredential>;
   userProfile: UserProfile | null | undefined;
   refreshUserProfile: () => Promise<void>;
   linkEmailPassword: (email: string, password: string) => Promise<UserCredential>;
   isGoogleUser: boolean;
   checkEmailProvider: (email: string) => Promise<string[]>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -77,36 +77,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(email: string, password: string) {
     try {
-      const methods = await fetchSignInMethodsForEmail(auth, email);
-
-      if (methods.length === 0) {
-        throw new Error('No account found with this email. Please check your email or sign up.');
-      }
-
-      // If the email is only associated with Google
-      if (methods.length === 1 && methods[0] === GoogleAuthProvider.PROVIDER_ID) {
-        throw new Error('This email is associated with a Google account. Please sign in with Google to proceed, then you can set up a password.');
-      }
-
-      // If email/password method is available, try to sign in
-      if (methods.includes(EmailAuthProvider.PROVIDER_ID)) {
-        return await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        // This case should ideally not be reached if methods is not empty and doesn't contain password provider
-        // but includes other providers not handled (e.g., Facebook, Twitter without email/password)
-        throw new Error('This email is associated with a different login method. Please try signing in with Google or another linked provider.');
-      }
+      // First try to sign in with email/password
+      return await signInWithEmailAndPassword(auth, email, password);
     } catch (error: any) {
-      if (error.code === 'auth/wrong-password') {
+      if (error.code === 'auth/user-not-found') {
+        // If user not found, check if it's a Google-only account
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        if (methods.includes(GoogleAuthProvider.PROVIDER_ID) && !methods.includes(EmailAuthProvider.PROVIDER_ID)) {
+          throw new Error('This email is associated with a Google account. Please sign in with Google to proceed, then you can set up a password.');
+        }
+        throw new Error('No account found with this email. Please check your email or sign up.');
+      } else if (error.code === 'auth/wrong-password') {
         throw new Error('Incorrect password. Please try again.');
+      } else if (error.code === 'auth/invalid-credential') {
+        // If invalid credential, recheck for Google-only case for clarity
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        if (methods.includes(GoogleAuthProvider.PROVIDER_ID) && !methods.includes(EmailAuthProvider.PROVIDER_ID)) {
+          throw new Error('This email is associated with a Google account. Please sign in with Google to proceed, then you can set up a password.');
+        }
+        throw new Error('Invalid login credentials. Please check your email and password.');
       }
-      // Re-throw specific errors thrown above, or general Firebase errors
+      // For any other unexpected error
       throw error;
     }
-  }
-
-  function logout() {
-    return signOut(auth);
   }
 
   async function googleSignIn() {
@@ -173,13 +166,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     signup,
     login,
-    logout,
     googleSignIn,
     userProfile,
     refreshUserProfile,
     linkEmailPassword,
     isGoogleUser,
-    checkEmailProvider
+    checkEmailProvider,
+    signOut: () => auth.signOut(),
   };
 
   return (

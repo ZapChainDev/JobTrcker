@@ -13,6 +13,7 @@ interface JobApplication {
   status: 'applied' | 'interviewing' | 'rejected' | 'offer';
   notes: string;
   resumeLink: string;
+  websiteLink?: string;
   statusHistory: StatusChange[];
 }
 
@@ -22,6 +23,7 @@ interface UserProfile {
   age: number;
   course: string;
   motivation: string;
+  themeColor?: string;
 }
 
 export type { StatusChange, JobApplication, UserProfile }; 
