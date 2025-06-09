@@ -54,6 +54,11 @@ export function Navbar() {
                 <DropdownMenuItem onClick={() => navigate('/profile')}>
                   Profile Settings
                 </DropdownMenuItem>
+                {currentUser.uid === 'iIqPkeXnwrd2MhlhLuAtxqBWIq02' && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin">Admin Dashboard</Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleSignOut}>
                   Sign Out
                 </DropdownMenuItem>

@@ -13,6 +13,7 @@ import { CalendarView } from '../components/CalendarView';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { ApplicationCard } from '../components/ApplicationCard';
 import Profile from './Profile';
+import { MovingText } from '@/components/MovingText';
 
 export function Dashboard() {
   const { currentUser } = useAuth();
@@ -208,113 +209,116 @@ export function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">JobTrackr Dashboard</h1>
-        <Button variant="outline" onClick={handleSignOut}>
-          Sign Out
-        </Button>
-      </div>
+    <div className="container mx-auto px-4 py-8">
+      <MovingText />
+      <div className="container mx-auto p-4 space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">JobTrackr Dashboard</h1>
+          <Button variant="outline" onClick={handleSignOut}>
+            Sign Out
+          </Button>
+        </div>
 
-      <Tabs defaultValue="list" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="list">List View</TabsTrigger>
-          <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="list" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="list">List View</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="list" className="space-y-4">
-          {/* Analytics Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
-              <CardTitle className="text-lg font-semibold text-gray-700">Total Applications</CardTitle>
-              <CardContent className="text-4xl font-bold text-blue-600 mt-2">
-                {applications.length}
-              </CardContent>
-            </Card>
-            <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
-              <CardTitle className="text-lg font-semibold text-gray-700">Applied</CardTitle>
-              <CardContent className="text-4xl font-bold text-blue-600 mt-2">
-                {statusCounts.applied}
-              </CardContent>
-            </Card>
-            <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
-              <CardTitle className="text-lg font-semibold text-gray-700">Interviewing</CardTitle>
-              <CardContent className="text-4xl font-bold text-yellow-600 mt-2">
-                {statusCounts.interviewing}
-              </CardContent>
-            </Card>
-            <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
-              <CardTitle className="text-lg font-semibold text-gray-700">Offer</CardTitle>
-              <CardContent className="text-4xl font-bold text-green-600 mt-2">
-                {statusCounts.offered}
-              </CardContent>
-            </Card>
-            <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
-              <CardTitle className="text-lg font-semibold text-gray-700">Accepted</CardTitle>
-              <CardContent className="text-4xl font-bold text-purple-600 mt-2">
-                {statusCounts.accepted}
-              </CardContent>
-            </Card>
-          </div>
+          <TabsContent value="list" className="space-y-4">
+            {/* Analytics Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
+                <CardTitle className="text-lg font-semibold text-gray-700">Total Applications</CardTitle>
+                <CardContent className="text-4xl font-bold text-blue-600 mt-2">
+                  {applications.length}
+                </CardContent>
+              </Card>
+              <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
+                <CardTitle className="text-lg font-semibold text-gray-700">Applied</CardTitle>
+                <CardContent className="text-4xl font-bold text-blue-600 mt-2">
+                  {statusCounts.applied}
+                </CardContent>
+              </Card>
+              <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
+                <CardTitle className="text-lg font-semibold text-gray-700">Interviewing</CardTitle>
+                <CardContent className="text-4xl font-bold text-yellow-600 mt-2">
+                  {statusCounts.interviewing}
+                </CardContent>
+              </Card>
+              <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
+                <CardTitle className="text-lg font-semibold text-gray-700">Offer</CardTitle>
+                <CardContent className="text-4xl font-bold text-green-600 mt-2">
+                  {statusCounts.offered}
+                </CardContent>
+              </Card>
+              <Card className="bg-white shadow-lg rounded-lg p-4 text-center">
+                <CardTitle className="text-lg font-semibold text-gray-700">Accepted</CardTitle>
+                <CardContent className="text-4xl font-bold text-purple-600 mt-2">
+                  {statusCounts.accepted}
+                </CardContent>
+              </Card>
+            </div>
 
-          <div className="flex flex-col md:flex-row gap-4 mb-8 items-center">
-            <Input
-              placeholder="Search by job title or company..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="max-w-md md:flex-1 p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
-            />
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-[200px] p-2 border border-gray-300 rounded-lg shadow-sm">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="applied">Applied</SelectItem>
-                <SelectItem value="interviewing">Interviewing</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-                <SelectItem value="offered">Offer</SelectItem>
-                <SelectItem value="accepted">Accepted</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">Your Applications</h2>
-            <Button onClick={() => {
-              setSelectedApplication(undefined);
-              setIsFormOpen(true);
-            }}>Add Application</Button>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredApplications.map((application) => (
-              <ApplicationCard 
-                key={application.id} 
-                application={application}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
+            <div className="flex flex-col md:flex-row gap-4 mb-8 items-center">
+              <Input
+                placeholder="Search by job title or company..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="max-w-md md:flex-1 p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-500"
               />
-            ))}
-          </div>
-        </TabsContent>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full md:w-[200px] p-2 border border-gray-300 rounded-lg shadow-sm">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="applied">Applied</SelectItem>
+                  <SelectItem value="interviewing">Interviewing</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                  <SelectItem value="offered">Offer</SelectItem>
+                  <SelectItem value="accepted">Accepted</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-        <TabsContent value="calendar">
-          <CalendarView applications={applications} />
-        </TabsContent>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold">Your Applications</h2>
+              <Button onClick={() => {
+                setSelectedApplication(undefined);
+                setIsFormOpen(true);
+              }}>Add Application</Button>
+            </div>
 
-        <TabsContent value="profile">
-          <Profile />
-        </TabsContent>
-      </Tabs>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredApplications.map((application) => (
+                <ApplicationCard 
+                  key={application.id} 
+                  application={application}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+          </TabsContent>
 
-      <ApplicationForm 
-        open={isFormOpen} 
-        onOpenChange={setIsFormOpen}
-        application={selectedApplication}
-        onSuccess={handleFormSuccess}
-      />
+          <TabsContent value="calendar">
+            <CalendarView applications={applications} />
+          </TabsContent>
+
+          <TabsContent value="profile">
+            <Profile />
+          </TabsContent>
+        </Tabs>
+
+        <ApplicationForm 
+          open={isFormOpen} 
+          onOpenChange={setIsFormOpen}
+          application={selectedApplication}
+          onSuccess={handleFormSuccess}
+        />
+      </div>
     </div>
   );
 } 

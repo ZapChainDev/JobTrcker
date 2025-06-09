@@ -7,6 +7,8 @@ import { ProfileSetup } from './components/ProfileSetup';
 import Profile from './pages/Profile';
 import { Navbar } from './components/Navbar';
 import GlobalChat from './components/GlobalChat';
+import Admin from './pages/Admin';
+import { Toaster } from 'sonner';
 
 console.log("Test Message from .env:", import.meta.env.VITE_TEST_MESSAGE);
 
@@ -15,6 +17,7 @@ function App() {
 
   return (
     <Router>
+      <Toaster position="top-right" />
       {currentUser && <Navbar />}
       <Routes>
         <Route path="/login" element={!currentUser ? <Login /> : <Navigate to="/dashboard" />} />
@@ -40,6 +43,10 @@ function App() {
         <Route
           path="/chat"
           element={currentUser ? <GlobalChat /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/admin"
+          element={currentUser ? <Admin /> : <Navigate to="/login" />}
         />
         <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>
