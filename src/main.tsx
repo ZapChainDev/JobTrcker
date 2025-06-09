@@ -4,10 +4,15 @@ import './index.css'
 import App from './App'
 import { AuthProvider } from './contexts/AuthContext'
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root')
+if (!rootElement) throw new Error('Failed to find the root element')
+
+const root = ReactDOM.createRoot(rootElement)
+
+root.render(
   <React.StrictMode>
     <AuthProvider>
-    <App />
+      <App />
     </AuthProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 )
