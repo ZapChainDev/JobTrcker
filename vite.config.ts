@@ -11,5 +11,18 @@ export default defineConfig({
     },
   },
   build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+        },
+      },
+    },
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
   },
 })
