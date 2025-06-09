@@ -11,10 +11,20 @@ export default defineConfig({
     },
   },
   build: {
-    commonjsOptions: {
-      include: [/node_modules/],
-      transformMixedEsModules: true,
+    outDir: 'dist',
+    sourcemap: false,
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+        },
+      },
     },
+  },
+  server: {
+    port: 3000,
+    strictPort: true,
   },
 })
 
