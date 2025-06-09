@@ -6,11 +6,10 @@ const disrespectfulWords = ['fuck', 'shit', 'asshole', 'bitch', 'cunt', 'damn', 
 const botResponse = "Please remember to be respectful and constructive in the chat. Let's keep it a positive environment for everyone!";
 
 interface RespectBotProps {
-  lastMessageUserId: string | null;
   onShowOverlay: (message: string, sender: string) => void;
 }
 
-export default function RespectBot({ lastMessageUserId, onShowOverlay }: RespectBotProps) {
+export default function RespectBot({ onShowOverlay }: RespectBotProps) {
   useEffect(() => {
     const q = query(collection(db, 'messages'), orderBy('timestamp', 'desc'));
     
@@ -31,7 +30,7 @@ export default function RespectBot({ lastMessageUserId, onShowOverlay }: Respect
     });
 
     return () => unsubscribe();
-  }, [onShowOverlay]); // Add onShowOverlay to dependency array
+  }, [onShowOverlay]);
 
   return null;
 } 

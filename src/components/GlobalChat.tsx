@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc, deleteDoc, where, setDoc } from 'firebase/firestore';
-import { db, auth } from '../lib/firebase';
+import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
@@ -336,8 +336,7 @@ export default function GlobalChat() {
           </Button>
         </form>
       </div>
-      {/* Render the RespectBot component and pass the callback */} 
-      <RespectBot lastMessageUserId={messages.length > 0 ? messages[messages.length - 1].userId : null} onShowOverlay={handleShowBotOverlay} /> 
+      <RespectBot onShowOverlay={handleShowBotOverlay} />
 
       {showOverlayMessage && (
         <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
