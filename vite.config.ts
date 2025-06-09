@@ -8,25 +8,13 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "react/jsx-runtime": "react/jsx-runtime.js",
     },
   },
   build: {
-    rollupOptions: {
-      // external: ['react/jsx-runtime'],
-      // output: {
-      //   manualChunks: {
-      //     'react-vendor': ['react', 'react-dom'],
-      //   },
-      // },
-    },
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: true,
     },
-  },
-  optimizeDeps: {
-    include: ['react/jsx-runtime'],
   },
 })
 
