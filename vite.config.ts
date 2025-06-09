@@ -26,6 +26,8 @@ export default defineConfig({
         /node_modules/,
         /node_modules\/react\//,
         /node_modules\/react-dom\//,
+        'react',
+        'react-dom',
         'react/jsx-runtime',
         'react/jsx-dev-runtime'
       ],
