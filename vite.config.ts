@@ -22,12 +22,23 @@ export default defineConfig({
       },
     },
     commonjsOptions: {
-      include: [/node_modules/],
+      include: [
+        /node_modules/,
+        /node_modules\/react\//,
+        /node_modules\/react-dom\//,
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime'
+      ],
       transformMixedEsModules: true,
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom'],
+    include: [
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+      'react/jsx-dev-runtime'
+    ],
   },
   server: {
     port: 3000,
