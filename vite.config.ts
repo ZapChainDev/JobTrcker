@@ -15,32 +15,18 @@ export default defineConfig({
     sourcemap: false,
     minify: 'terser',
     rollupOptions: {
+      external: ['react', 'react-dom'],
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-        },
-      },
-    },
-    commonjsOptions: {
-      include: [
-        /node_modules/,
-        /node_modules\/react\//,
-        /node_modules\/react-dom\//,
-        'react',
-        'react-dom',
-        'react/jsx-runtime',
-        'react/jsx-dev-runtime'
-      ],
-      transformMixedEsModules: true,
-    },
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM'
+        }
+      }
+    }
   },
   optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'react/jsx-runtime',
-      'react/jsx-dev-runtime'
-    ],
+    include: ['react', 'react-dom'],
+    exclude: ['@vitejs/plugin-react']
   },
   server: {
     port: 3000,
