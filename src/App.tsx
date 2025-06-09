@@ -6,6 +6,7 @@ import { Dashboard } from './pages/Dashboard';
 import { ProfileSetup } from './components/ProfileSetup';
 import Profile from './pages/Profile';
 import { Navbar } from './components/Navbar';
+import GlobalChat from './components/GlobalChat';
 
 console.log("Test Message from .env:", import.meta.env.VITE_TEST_MESSAGE);
 
@@ -35,6 +36,10 @@ function App() {
         <Route
           path="/profile"
           element={currentUser ? <Profile /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/chat"
+          element={currentUser ? <GlobalChat /> : <Navigate to="/login" />}
         />
         <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>

@@ -13,6 +13,8 @@
     "node": "20.x"
   },
   "dependencies": {
+    "@emoji-mart/data": "^1.2.1",
+    "@emoji-mart/react": "^1.1.1",
     "@fullcalendar/daygrid": "^6.1.11",
     "@fullcalendar/interaction": "^6.1.17",
     "@fullcalendar/react": "^6.1.17",
@@ -28,17 +30,17 @@
     "dotenv": "^16.5.0",
     "firebase": "^10.0.0",
     "lucide-react": "^0.513.0",
-    "react": "^19.1.0",
+    "react": "^18.2.0",
     "react-calendar": "^6.0.0",
-    "react-dom": "^19.1.0",
+    "react-dom": "^18.2.0",
     "react-router-dom": "^7.6.2",
     "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@types/node": "^22.15.30",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.14",
     "eslint": "^9.25.0",

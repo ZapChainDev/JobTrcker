@@ -14,7 +14,7 @@ import {
   GoogleAuthProvider,
   fetchSignInMethodsForEmail
 } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { app } from '../lib/firebase';
 import { UserProfile } from '../lib/types';
 
@@ -57,13 +57,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const docRef = doc(db, 'userProfiles', user.uid);
       const docSnap = await getDoc(docRef);
+      let profileData: UserProfile | null = null;
+
       if (docSnap.exists()) {
-        setUserProfile(docSnap.data() as UserProfile);
-      } else {
-        setUserProfile(null);
+        profileData = docSnap.data() as UserProfile;
       }
+
+      // Ensure photoURL from Firebase Auth is saved to Firestore profile
+      if (user.photoURL && profileData?.photoURL !== user.photoURL) {
+        await setDoc(docRef, { photoURL: user.photoURL }, { merge: true });
+        profileData = { ...profileData, photoURL: user.photoURL } as UserProfile;
+      }
+
+      if (!profileData) {
+        // If no profile exists, create a basic one including photoURL
+        profileData = {
+          uid: user.uid,
+          email: user.email || '',
+          displayName: user.displayName || 'Anonymous',
+          createdAt: serverTimestamp() as any, // Firebase Timestamp
+          updatedAt: serverTimestamp() as any, // Firebase Timestamp
+          photoURL: user.photoURL || undefined,
+        };
+        await setDoc(docRef, profileData, { merge: true });
+      }
+
+      setUserProfile(profileData);
+
     } catch (error) {
-      console.error("Error fetching user profile:", error);
+      console.error("Error fetching or setting user profile:", error);
       setUserProfile(null);
     }
   };
