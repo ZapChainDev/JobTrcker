@@ -30,9 +30,6 @@ export const Navbar = () => {
         <Link to="/meet-creator" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
           Meet Creator
         </Link>
-        <Link to="/chat" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
-          Chat
-        </Link>
         {currentUser && (
           <>
             <Link to="/" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
@@ -43,6 +40,9 @@ export const Navbar = () => {
             </Link>
             <Link to="/job-directories" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
               Job Directories
+            </Link>
+            <Link to="/chat" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
+              Chat
             </Link>
           </>
         )}
