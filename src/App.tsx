@@ -11,6 +11,7 @@ import Admin from './pages/Admin';
 import { Toaster } from 'sonner';
 import JobDirectoriesPage from './pages/JobDirectoriesPage';
 import { DiscussionBoard } from './components/discussion/DiscussionBoard';
+import { MeetCreator } from './components/MeetCreator';
 
 console.log("Test Message from .env:", import.meta.env.VITE_TEST_MESSAGE);
 
@@ -28,7 +29,7 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
-        {currentUser && <Navbar />}
+        <Navbar />
         <Routes>
           <Route path="/login" element={!currentUser ? <Login /> : <Navigate to="/" />} />
           <Route path="/register" element={!currentUser ? <Register /> : <Navigate to="/" />} />
@@ -39,6 +40,7 @@ function App() {
           <Route path="/admin" element={currentUser ? <Admin /> : <Navigate to="/login" />} />
           <Route path="/job-directories" element={currentUser ? <JobDirectoriesPage /> : <Navigate to="/login" />} />
           <Route path="/discussion" element={currentUser ? <DiscussionBoard /> : <Navigate to="/login" />} />
+          <Route path="/meet-creator" element={<MeetCreator />} />
         </Routes>
         <Toaster />
       </div>
