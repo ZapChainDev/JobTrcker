@@ -27,18 +27,21 @@ export const Navbar = () => {
   const NavLinks = () => {
     return (
       <>
-        <Link to="/meet-creator" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+        <Link to="/meet-creator" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
           Meet Creator
+        </Link>
+        <Link to="/chat" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
+          Chat
         </Link>
         {currentUser && (
           <>
-            <Link to="/" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+            <Link to="/" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
               Home
             </Link>
-            <Link to="/discussion" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+            <Link to="/discussion" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
               Discussion
             </Link>
-            <Link to="/job-directories" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+            <Link to="/job-directories" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-semibold">
               Job Directories
             </Link>
           </>
@@ -100,9 +103,6 @@ export const Navbar = () => {
                   <div className="h-px bg-gray-200 dark:bg-gray-700 my-2" />
                   <DropdownMenuItem asChild>
                     <Link to="/profile">Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/chat">Chat</Link>
                   </DropdownMenuItem>
                   <div className="h-px bg-gray-200 dark:bg-gray-700 my-2" />
                   <DropdownMenuItem onClick={handleSignOut}>
