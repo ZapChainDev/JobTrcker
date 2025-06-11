@@ -38,6 +38,12 @@ export function Navbar() {
             >
               Global Chat
             </Link>
+            <Link 
+              to="/job-directories" 
+              className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors"
+            >
+              Job Directories
+            </Link>
           </div>
 
           <div className="flex items-center space-x-4">

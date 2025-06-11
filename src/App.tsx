@@ -9,6 +9,7 @@ import { Navbar } from './components/Navbar';
 import GlobalChat from './components/GlobalChat';
 import Admin from './pages/Admin';
 import { Toaster } from 'sonner';
+import JobDirectoriesPage from './pages/JobDirectoriesPage';
 
 console.log("Test Message from .env:", import.meta.env.VITE_TEST_MESSAGE);
 
@@ -47,6 +48,10 @@ function App() {
         <Route
           path="/admin"
           element={currentUser ? <Admin /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/job-directories"
+          element={currentUser ? <JobDirectoriesPage /> : <Navigate to="/login" />}
         />
         <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>
