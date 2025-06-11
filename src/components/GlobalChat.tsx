@@ -194,8 +194,8 @@ export default function GlobalChat() {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6 lg:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen relative">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-4 md:p-6 flex flex-col h-[calc(100vh-64px-32px)]">
+    <div className="w-full h-[calc(100vh-64px)] bg-gray-50 dark:bg-gray-900 relative">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-4 md:p-6 flex flex-col h-full">
         <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 text-center">Global Chat</h2>
         
         <div className="flex-1 overflow-y-auto mb-6 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 custom-scrollbar">
@@ -287,7 +287,7 @@ export default function GlobalChat() {
             return (
               <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 {otherTypingUsers
-                  .map(() => 'Anonymous User') // Display as Anonymous User
+                  .map(() => 'Anonymous User')
                   .join(', ')}{' '}
                 {otherTypingUsers.length === 1 ? 'is' : 'are'} typing...
               </div>
