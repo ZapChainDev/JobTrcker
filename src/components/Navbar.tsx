@@ -104,6 +104,11 @@ export const Navbar = () => {
                   <DropdownMenuItem asChild>
                     <Link to="/profile">Profile</Link>
                   </DropdownMenuItem>
+                  {currentUser?.uid === 'iIqPkeXnwrd2MhlhLuAtxqBWIq02' && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin">Admin Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
                   <div className="h-px bg-gray-200 dark:bg-gray-700 my-2" />
                   <DropdownMenuItem onClick={handleSignOut}>
                     Log out
